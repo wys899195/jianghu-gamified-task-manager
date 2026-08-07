@@ -11,7 +11,7 @@
 services:
   mysql:
     image: mysql:9.7
-    container_name: jianhu-task-manager-mysql
+    container_name: jianghu-task-manager-mysql
 
     # Ubuntu 或 Docker 重啟後，自動重新啟動 MySQL。
     restart: unless-stopped
@@ -66,4 +66,4 @@ services:
 volumes:
   mysql_data:
     # 固定 Volume 名稱。
-    name: jianhu_mysql_data
+    name: jianghu_mysql_data

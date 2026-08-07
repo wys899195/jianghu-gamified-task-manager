@@ -1,3 +1,7 @@
+// ========================================
+// Backend Server Configuration
+// ========================================
+
 import { serverEnv } from './env.js';
 
 export const serverConfig = {

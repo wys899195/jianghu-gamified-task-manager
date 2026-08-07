@@ -1,25 +1,25 @@
+// ========================================
+// Backend Server Entry Point
+// ========================================
 import express from 'express';
 import { serverConfig } from './config/serverConfig.js';
 import type { RowDataPacket } from 'mysql2';
-import { mysqlPool } from './infrastructure/mysqlConnector.js';
+import { backendMysqlPool } from './infrastructure/database/mysqlConnector.js';
 
 const app = express();
 
 // 解析 JSON request body。
 app.use(express.json());
 
-// ========================================
+
 // (API) Backend Health Check 
-// ========================================
 app.get('/api/health', (_req, res) => {
     res.status(200).json({ message: 'Backend is running' });
 });
 
 
 
-// ========================================
 // (API) Database Health Check
-// ========================================
 interface DatabaseHealthRow extends RowDataPacket {
   connected: number;
   databaseName: string;
@@ -29,7 +29,7 @@ interface DatabaseHealthRow extends RowDataPacket {
 // 確認 Express 是否能成功連線至 MySQL。
 app.get('/api/health/database', async (_req, res) => {
   try {
-    const [rows] = await mysqlPool.execute<DatabaseHealthRow[]>(`
+    const [rows] = await backendMysqlPool.execute<DatabaseHealthRow[]>(`
       SELECT
         1 AS connected,
         DATABASE() AS databaseName,
@@ -52,11 +52,7 @@ app.get('/api/health/database', async (_req, res) => {
 });
 
 
-
-
-// ========================================
 // Start Server
-// ========================================
 app.listen(serverConfig.port, serverConfig.host, () => {
   console.log(
     `Backend running at http://${serverConfig.host}:${serverConfig.port}`,

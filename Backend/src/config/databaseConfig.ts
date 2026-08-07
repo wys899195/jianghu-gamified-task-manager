@@ -1,3 +1,7 @@
+// ========================================
+// Backend Database Configuration
+// ========================================
+
 import { databaseEnv } from './env.js';
 
 const databaseUrl = new URL(
@@ -14,5 +18,10 @@ export const databaseConfig = {
     name: databaseEnv.DB_NAME,
     user: databaseEnv.DB_USER,
     password: databaseEnv.DB_PASSWORD,
-    connectionLimit: databaseEnv.DB_CONNECTION_LIMIT,
+    waitForConnections: databaseEnv.DB_WAIT_FOR_CONNECTIONS,
+    queueLimit: databaseEnv.DB_QUEUE_LIMIT,
+
+    charset: databaseEnv.DB_CHARSET,
+    supportBigNumbers: databaseEnv.DB_SUPPORT_BIG_NUMBERS,
+    bigNumberStrings: databaseEnv.DB_BIG_NUMBER_STRINGS,
 } as const;
