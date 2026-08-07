@@ -1,0 +1,69 @@
+# compose.yaml
+#
+# 此 Compose 目前只負責：
+# 1. 啟動 MySQL
+# 2. 建立並掛載持久化 Volume
+# 3. 將 MySQL 的 3306 port 映射到 Ubuntu 本機
+#
+# 後端目前仍直接在 Ubuntu 本機執行，
+# 因此後端會透過 127.0.0.1:3306 連線。
+
+services:
+  mysql:
+    image: mysql:9.7
+    container_name: jianhu-task-manager-mysql
+
+    # Ubuntu 或 Docker 重啟後，自動重新啟動 MySQL。
+    restart: unless-stopped
+
+    # 將根目錄.env中的值注入MySQL容器。
+    environment:
+      # MySQL root管理員密碼
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:? env MYSQL_ROOT_PASSWORD is required}
+      # MySQL第一次初始化時，自動建立的資料庫。
+      MYSQL_DATABASE: ${MYSQL_DATABASE:? env MYSQL_DATABASE is required}
+      # MySQL第一次初始化時，自動建立給後端使用的帳號與密碼。
+      MYSQL_USER: ${MYSQL_USER:? env MYSQL_USER is required}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:? env MYSQL_PASSWORD is required}
+
+      TZ: Asia/Taipei
+
+    ports:
+      # Ubuntu本機port : MySQL容器port
+      - "127.0.0.1:${MYSQL_PORT:?:?env:?env MYSQL_PORT is required}:3306"
+
+    volumes:
+      # MySQL 資料會保存在 volume，即使執行 docker compose down 資料仍然保留。
+      # 但執行  docker compose down -v 指令會刪除資料
+      - mysql_data:/var/lib/mysql
+
+      # 自動執行初始化 SQL，只會在 Volume 第一次初始化時執行。
+      # 本機./database/init底下的所有sql檔按照字元順序執行初始化。
+      - ./database/init:/docker-entrypoint-initdb.d:ro
+
+    # 額外設定 MySQL 字元集，utf8mb4 可完整保存繁體中文及 Emoji。
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+
+    # 定期確認 MySQL 是否準備好接受連線。
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "mysqladmin ping -h 127.0.0.1 -u root -p$$MYSQL_ROOT_PASSWORD --silent",
+        ]
+      # 每 n 秒檢查一次。
+      interval: 5s
+      # 單次檢查超過 n 秒視為失敗。
+      timeout: 5s
+      # 最多連續失敗 n 次，才標記為 unhealthy。
+      retries: 20
+      # MySQL 初始化期間先等待 30 秒，避免剛啟動就被判定失敗。
+      start_period: 30s
+
+# 第一次執行 docker compose up 時 Docker 會自動建立Volume。
+volumes:
+  mysql_data:
+    # 固定 Volume 名稱。
+    name: jianhu_mysql_data
