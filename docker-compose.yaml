@@ -25,7 +25,7 @@ services:
       # MySQL第一次初始化時，自動建立給後端使用的帳號與密碼。
       MYSQL_USER: ${MYSQL_USER:? env MYSQL_USER is required}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:? env MYSQL_PASSWORD is required}
-
+      # MySQL容器的時區，用於容器log。
       TZ: Asia/Taipei
 
     ports:
@@ -42,9 +42,11 @@ services:
       - ./database/init:/docker-entrypoint-initdb.d:ro
 
     # 額外設定 MySQL 字元集，utf8mb4 可完整保存繁體中文及 Emoji。
+    # 額外設定資料庫預設時區。
     command:
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_unicode_ci
+      - --character-set-server=${MYSQL_CHARACTER_SET:?env MYSQL_CHARACTER_SET is required}
+      - --collation-server=${MYSQL_COLLATION:?env MYSQL_COLLATION is required}
+      - --default-time-zone=${MYSQL_TIMEZONE:?env MYSQL_TIMEZONE is required}
 
     # 定期確認 MySQL 是否準備好接受連線。
     healthcheck:

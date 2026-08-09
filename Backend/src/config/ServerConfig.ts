@@ -2,7 +2,7 @@
 // Backend Server Configuration
 // ========================================
 
-import { serverEnv } from './env.js';
+import { serverEnv } from './Env.js';
 
 export const serverConfig = {
     host: serverEnv.SERVER_HOST,

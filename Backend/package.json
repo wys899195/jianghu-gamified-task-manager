@@ -8,39 +8,39 @@
     "main": "dist/server.js",
     "scripts": {
         "dev:server": "tsx watch src/server.ts",
-        "dev:db:migrate": "NODE_ENV=development tsx src/infrastructure/database/migrationRunner.ts",
+        "dev:db:migrate": "NODE_ENV=development tsx src/infrastructure/database/MigrationRunner.ts",
         "dev:start": "npm run dev:db:migrate && npm run dev:server",
-
         "test": "node --test",
         "test:server": "NODE_ENV=test node dist/server.js",
-
-        "prod:db:migrate": "NODE_ENV=production node dist/infrastructure/database/migrationRunner.js",
+        "prod:db:migrate": "NODE_ENV=production node dist/infrastructure/database/MigrationRunner.js",
         "prod:server": "NODE_ENV=production node dist/server.js",
         "prod:start": "npm run prod:db:migrate && npm run prod:server",
-
         "clean": "rm -rf dist",
         "build": "npm run clean && tsc",
-
         "typecheck": "tsc --noEmit",
         "check": "npm run typecheck && npm run test"
-
     },
     "dependencies": {
+        "bcrypt": "^6.0.0",
         "dotenv": "^17.4.2",
         "express": "^5.2.1",
+        "jsonwebtoken": "^9.0.3",
         "mysql2": "^3.23.2",
         "pino": "^10.3.1",
         "umzug": "^3.8.3",
         "zod": "^4.4.3"
     },
     "devDependencies": {
+        "@types/bcrypt": "^6.0.0",
         "@types/express": "^5.0.6",
+        "@types/jsonwebtoken": "^9.0.10",
         "@types/node": "^24.13.3",
         "tslib": "^2.8.1",
         "tsx": "^4.23.9",
         "typescript": "^6.0.3"
     },
     "allowScripts": {
-        "esbuild@0.28.1": true
+        "esbuild@0.28.1": true,
+        "bcrypt@6.0.0": true
     }
 }

@@ -7,7 +7,7 @@ import mysql, {
   type PoolOptions,
 } from 'mysql2/promise';
 
-import { databaseConfig } from '../../config/databaseConfig.js';
+import { databaseConfig } from '../../config/DatabaseConfig.js';
 
 export function createMysqlPool(
   overrides: Partial<PoolOptions> = {},
@@ -24,7 +24,8 @@ export function createMysqlPool(
     charset: databaseConfig.charset,
     supportBigNumbers: databaseConfig.supportBigNumbers,
     bigNumberStrings: databaseConfig.bigNumberStrings,
-
+    timezone: databaseConfig.timezone,
+    
     ...overrides,
   });
 }

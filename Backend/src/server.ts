@@ -2,9 +2,9 @@
 // Backend Server Entry Point
 // ========================================
 import express from 'express';
-import { serverConfig } from './config/serverConfig.js';
+import { serverConfig } from './config/ServerConfig.js';
 import type { RowDataPacket } from 'mysql2';
-import { backendMysqlPool } from './infrastructure/database/mysqlConnector.js';
+import { backendMysqlPool } from './infrastructure/database/MysqlConnector.js';
 
 const app = express();
 
@@ -54,7 +54,14 @@ app.get('/api/health/database', async (_req, res) => {
 
 // Start Server
 app.listen(serverConfig.port, serverConfig.host, () => {
-  console.log(
+    console.log("現在時間:", new Date());
+    console.log("ISO UTC:", new Date().toISOString());
+    console.log("Timezone offset:", new Date().getTimezoneOffset());
+    console.log(
+    "Resolved timezone:",
+    Intl.DateTimeFormat().resolvedOptions().timeZone
+    ); 
+    console.log(
     `Backend running at http://${serverConfig.host}:${serverConfig.port}`,
   );
 });

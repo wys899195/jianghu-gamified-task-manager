@@ -3,8 +3,8 @@ import path from 'node:path';
 
 import { Umzug } from 'umzug';
 
-import { createMysqlPool } from './mysqlPoolFactory.js';
-import { MySqlMigrationStorage } from './migrationStorage.js';
+import { createMysqlPool } from './MysqlPoolFactory.js';
+import { MySqlMigrationStorage } from './MigrationStorage.js';
 
 
 // ========================================
