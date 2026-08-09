@@ -5,7 +5,7 @@ import type {
 
 import {
     backendMysqlPool,
-} from '../infrastructure/database/MysqlConnector.js';
+} from '../../../infrastructure/database/MysqlConnector.js';
 
 
 type SessionExistsRow =

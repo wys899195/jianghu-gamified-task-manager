@@ -19,11 +19,11 @@ import {
 import {
     generateJti,
     createAccessToken,
-} from '../infrastructure/security/JwtTokenService.js';
+} from '../../../infrastructure/security/JwtTokenService.js';
 
-import { passwordConfig } from '../config/PasswordConfig.js';
-import { ApiError } from '../errors/ApiError.js';
-import { ApiErrorCode } from '../errors/ApiErrorCode.js';
+import { passwordConfig } from '../../../config/PasswordConfig.js';
+import { ApiError } from '../../../errors/ApiError.js';
+import { ApiErrorCode } from '../../../errors/ApiErrorCode.js';
 
 /**
  * 註冊新帳號。
