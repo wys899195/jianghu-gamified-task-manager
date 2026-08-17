@@ -4,6 +4,7 @@
 
 import 'dotenv/config';
 import { z } from 'zod';
+import type { StringValue } from 'ms';
 
 
 const envBoolean = z
@@ -31,20 +32,41 @@ const databaseSchema = z.object({
         .max(65535, 'DB_PORT 不可大於 65535'),
     DB_NAME: z.string().trim().min(1, 'DB_NAME 不可為空'),
     DB_USER: z.string().trim().min(1, 'DB_USER 不可為空'),
-    DB_PASSWORD: z.string().min(1, 'DB_PASSWORD 不可為空'),    
+    DB_PASSWORD: z.string().min(1, 'DB_PASSWORD 不可為空'),
 });
 
 
-// 驗證 JWT 身分驗證機制所需要的環境變數。
-const jwtSchema = z.object({
-  JWT_SECRET: z
-    .string()
-    .length(
-      64,
-      'JWT_SECRET 必須剛好 64 個字元',
-    ),
+// 驗證身分驗證機制所需要的環境變數。
+const authSchema = z.object({
+
+    JWT_SECRET: z
+        .string()
+        .length(
+            64,
+            'JWT_SECRET 必須剛好 64 個字元',
+        ),
+
+    ACCESS_TOKEN_EXPIRES_IN: z
+        .string()
+        .regex(
+            /^\d+(s|m|h|d)$/,
+            'ACCESS_TOKEN_EXPIRES_IN 格式錯誤，例如：15m、1h、7d',
+        )
+        .transform(
+            (value) => value as StringValue,
+        ),
+    REFRESH_TOKEN_EXPIRES_IN: z
+        .string()
+        .regex(
+            /^\d+(s|m|h|d)$/,
+            'REFRESH_TOKEN_EXPIRES_IN 格式錯誤，例如：15m、1h、7d',
+        )
+        .transform(
+            (value) => value as StringValue,
+        ),
+
 });
 
 export const serverEnv = serverSchema.parse(process.env);
 export const databaseEnv = databaseSchema.parse(process.env);
-export const jwtEnv = jwtSchema.parse(process.env);
+export const authEnv = authSchema.parse(process.env);

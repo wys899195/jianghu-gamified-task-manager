@@ -10,7 +10,7 @@
 
 services:
   mysql:
-    image: mysql:9.7
+    image: mysql:8.4
     container_name: jianghu-task-manager-mysql
 
     # Ubuntu 或 Docker 重啟後，自動重新啟動 MySQL。

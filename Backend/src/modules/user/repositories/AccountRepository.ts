@@ -1,3 +1,6 @@
+// ========================================
+// 負責使用者帳號相關的資料庫存取，包含帳號認證、密碼、個人檔案與帳號註銷等操作。
+// ========================================
 import type {
     ResultSetHeader,
     RowDataPacket,
@@ -23,7 +26,7 @@ type AccountProfileRow =
 
 type ExistsByEmailRow =
     RowDataPacket & {
-        exists: number;
+        exists: string | number;
     };
 
 type PasswordHashRow =
@@ -65,7 +68,7 @@ export async function findAuthByEmail(
 export async function createAccount(
     email: string,
     passwordHash: string,
-    nickname: string,
+    nickname: string, 
 ): Promise<number> {
     const [result] =
         await backendMysqlPool.execute<ResultSetHeader>(
@@ -117,7 +120,7 @@ export async function existsByEmail(
             [email],
         );
 
-    return rows[0]?.exists === 1;
+    return Number(rows[0]?.exists) === 1;
 }
 
 
