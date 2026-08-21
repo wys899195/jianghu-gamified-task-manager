@@ -11,6 +11,10 @@ const envBoolean = z
     .enum(['true', 'false'])
     .transform((value) => value === 'true');
 
+const runtimeSchema = z.object({
+    NODE_ENV: z.enum(['development', 'test', 'production']),
+});
+
 
 // 驗證 Backend HTTP Server 啟動所需要的環境變數
 const serverSchema = z.object({
@@ -31,6 +35,16 @@ const databaseSchema = z.object({
         .positive('DB_PORT 必須是正整數')
         .max(65535, 'DB_PORT 不可大於 65535'),
     DB_NAME: z.string().trim().min(1, 'DB_NAME 不可為空'),
+    DB_DEV_NAME: z
+        .string()
+        .trim()
+        .min(1, 'DB_DEV_NAME 不可為空')
+        .optional(),
+    DB_TEST_NAME: z
+        .string()
+        .trim()
+        .min(1, 'DB_TEST_NAME 不可為空')
+        .optional(),
     DB_USER: z.string().trim().min(1, 'DB_USER 不可為空'),
     DB_PASSWORD: z.string().min(1, 'DB_PASSWORD 不可為空'),
 });
@@ -67,6 +81,19 @@ const authSchema = z.object({
 
 });
 
+export const runtimeEnv = runtimeSchema.parse(process.env);
 export const serverEnv = serverSchema.parse(process.env);
-export const databaseEnv = databaseSchema.parse(process.env);
+
+const rawDatabaseEnv = databaseSchema.parse(process.env);
+
+export const databaseEnv = {
+    ...rawDatabaseEnv,
+    DB_NAME:
+        runtimeEnv.NODE_ENV === 'development'
+            ? rawDatabaseEnv.DB_DEV_NAME ?? `${rawDatabaseEnv.DB_NAME}_dev`
+            : runtimeEnv.NODE_ENV === 'test'
+                ? rawDatabaseEnv.DB_TEST_NAME ?? `${rawDatabaseEnv.DB_NAME}_test`
+                : rawDatabaseEnv.DB_NAME,
+};
+
 export const authEnv = authSchema.parse(process.env);

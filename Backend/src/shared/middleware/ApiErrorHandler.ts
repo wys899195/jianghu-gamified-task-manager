@@ -9,6 +9,10 @@ import type {
 
 import { ServiceError } from '../errors/ServiceError.js';
 
+import {
+  ZodError,
+} from 'zod';
+
 type ErrorHttpStatusMap =
   Record<string, number>;
 
@@ -23,6 +27,17 @@ export function createApiErrorHandler(
     res: Response,
     _next: NextFunction,
   ): void {
+
+    // Request Body 驗證失敗。
+    if (error instanceof ZodError) {
+
+      res.status(400).json({
+        message: 'Request validation failed.',
+        errors: error.issues,
+      });
+
+      return;
+    }
 
     // 預期錯誤 ServiceError
     if (error instanceof ServiceError) {

@@ -20,7 +20,7 @@ import {
 
 import {
     UserErrorCode,
-} from '../errors/UserErrorCode.js';
+} from '../apiErrors/UserErrorCode.js';
 
 
 /**

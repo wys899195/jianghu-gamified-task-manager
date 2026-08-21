@@ -22,6 +22,10 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:? env MYSQL_ROOT_PASSWORD is required}
       # MySQL第一次初始化時，自動建立的資料庫。
       MYSQL_DATABASE: ${MYSQL_DATABASE:? env MYSQL_DATABASE is required}
+      # Backend development 使用的獨立資料庫。
+      MYSQL_DEV_DATABASE: ${MYSQL_DEV_DATABASE:? env MYSQL_DEV_DATABASE is required}
+      # API / integration tests 使用的獨立資料庫。
+      MYSQL_TEST_DATABASE: ${MYSQL_TEST_DATABASE:? env MYSQL_TEST_DATABASE is required}
       # MySQL第一次初始化時，自動建立給後端使用的帳號與密碼。
       MYSQL_USER: ${MYSQL_USER:? env MYSQL_USER is required}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:? env MYSQL_PASSWORD is required}
@@ -37,8 +41,7 @@ services:
       # 但執行  docker compose down -v 指令會刪除資料
       - mysql_data:/var/lib/mysql
 
-      # 自動執行初始化 SQL，只會在 Volume 第一次初始化時執行。
-      # 本機./database/init底下的所有sql檔按照字元順序執行初始化。
+      # 保留初始化 SQL 掛載點；正式與測試 schema 由 Backend migration runner 管理。
       - ./database/init:/docker-entrypoint-initdb.d:ro
 
     # 額外設定 MySQL 字元集，utf8mb4 可完整保存繁體中文及 Emoji。

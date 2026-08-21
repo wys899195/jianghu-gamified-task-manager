@@ -22,7 +22,7 @@ import {
 
 import {
     UserErrorCode,
-} from '../errors/UserErrorCode.js';
+} from '../apiErrors/UserErrorCode.js';
 
 import {
     authConfig,
@@ -58,7 +58,7 @@ const REFRESH_TOKEN_COOKIE_OPTIONS = {
  * {
  *   email,
  *   password,
- *   nickname
+ *   nickname (optional; defaults to the service-defined default nickname)
  * }
  */
 export async function registerController(
@@ -69,18 +69,9 @@ export async function registerController(
 
     try {
 
-        const {
-            email,
-            password,
-            nickname,
-        } = req.body;
-
-
         const accountId =
             await register(
-                email,
-                password,
-                nickname,
+                req.body,
             );
 
 
@@ -130,17 +121,10 @@ export async function loginController(
     try {
 
         const {
-            email,
-            password,
-        } = req.body;
-
-
-        const {
             accessToken,
             refreshToken,
         } = await login(
-            email,
-            password,
+            req.body,
         );
 
 

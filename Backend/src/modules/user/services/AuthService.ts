@@ -42,12 +42,20 @@ import {
 
 import {
     UserErrorCode,
-} from '../errors/UserErrorCode.js';
+} from '../apiErrors/UserErrorCode.js';
+
+import type {
+    LoginRequest,
+    RegisterRequest,
+} from '../requestSchemas/AuthRequestSchema.js';
+
 
 
 // ========================================
 // Register
 // ========================================
+
+const DEFAULT_NICKNAME = '大俠';
 
 /**
  * 註冊新帳號。
@@ -59,13 +67,16 @@ import {
  * 3. 建立帳號
  */
 export async function register(
-    email: string,
-    password: string,
-    nickname: string,
+    request: RegisterRequest,
 ): Promise<number> {
 
-    const emailExists =
-        await existsByEmail(email);
+    const {
+        email,
+        password,
+        nickname = DEFAULT_NICKNAME,
+    } = request;
+
+    const emailExists = await existsByEmail(email);
 
 
     if (emailExists) {
@@ -76,7 +87,6 @@ export async function register(
         );
 
     }
-
 
     const passwordHash =
         await bcrypt.hash(
@@ -125,12 +135,16 @@ export async function register(
  * 在 Session 有效期間維持固定值。
  */
 export async function login(
-    email: string,
-    password: string,
+    request: LoginRequest,
 ): Promise<{
     accessToken: string;
     refreshToken: string;
 }> {
+
+    const {
+        email,
+        password,
+    } = request;
 
     const account =
         await findAuthByEmail(email);

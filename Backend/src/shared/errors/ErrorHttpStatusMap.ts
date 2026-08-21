@@ -4,7 +4,7 @@
 
 import {
     userErrorHttpStatusMap,
-} from '../../modules/user/errors/UserErrorHttpStatusMap.js';
+} from '../../modules/user/apiErrors/UserErrorHttpStatusMap.js';
 
 
 

@@ -44,6 +44,7 @@ app.use(cookieParser());
 app.get('/api/health', (_req, res) => {
 
     res.status(200).json({
+        status: 'ok',
         message: 'Backend is running',
     });
 

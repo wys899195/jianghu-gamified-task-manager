@@ -1,3 +1,8 @@
+// ========================================
+// 負責載入並依序執行 Database migrations，
+// 記錄 migration 執行狀態，並在完成後關閉專用資料庫連線池。
+// ========================================
+
 import fs from 'node:fs/promises';
 import path from 'node:path';
 

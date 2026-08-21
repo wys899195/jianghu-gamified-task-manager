@@ -15,6 +15,15 @@ import {
     logoutController,
 } from '../controllers/AuthController.js';
 
+import {
+    loginRequestSchema,
+    registerRequestSchema,
+} from '../requestSchemas/AuthRequestSchema.js';
+
+import {
+    validateRequestBody,
+} from '../../../shared/middleware/ValidationMiddleware.js';
+
 
 const router = Router();
 
@@ -30,6 +39,7 @@ const router = Router();
  */
 router.post(
     '/register',
+    validateRequestBody(registerRequestSchema),
     registerController,
 );
 
@@ -50,6 +60,7 @@ router.post(
  */
 router.post(
     '/login',
+    validateRequestBody(loginRequestSchema),
     loginController,
 );
 
