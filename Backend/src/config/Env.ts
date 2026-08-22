@@ -35,16 +35,6 @@ const databaseSchema = z.object({
         .positive('DB_PORT 必須是正整數')
         .max(65535, 'DB_PORT 不可大於 65535'),
     DB_NAME: z.string().trim().min(1, 'DB_NAME 不可為空'),
-    DB_DEV_NAME: z
-        .string()
-        .trim()
-        .min(1, 'DB_DEV_NAME 不可為空')
-        .optional(),
-    DB_TEST_NAME: z
-        .string()
-        .trim()
-        .min(1, 'DB_TEST_NAME 不可為空')
-        .optional(),
     DB_USER: z.string().trim().min(1, 'DB_USER 不可為空'),
     DB_PASSWORD: z.string().min(1, 'DB_PASSWORD 不可為空'),
 });
@@ -90,9 +80,9 @@ export const databaseEnv = {
     ...rawDatabaseEnv,
     DB_NAME:
         runtimeEnv.NODE_ENV === 'development'
-            ? rawDatabaseEnv.DB_DEV_NAME ?? `${rawDatabaseEnv.DB_NAME}_dev`
+            ? `${rawDatabaseEnv.DB_NAME}_dev`
             : runtimeEnv.NODE_ENV === 'test'
-                ? rawDatabaseEnv.DB_TEST_NAME ?? `${rawDatabaseEnv.DB_NAME}_test`
+                ? `${rawDatabaseEnv.DB_NAME}_test`
                 : rawDatabaseEnv.DB_NAME,
 };
 

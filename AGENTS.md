@@ -38,6 +38,7 @@ repo/
 ├── API-Tests             # API 測試 (Postman CLI)
 └── sh/                   # 專案部署、開發、測試腳本
     ├── common/           # 跨環境共用 shell helper
+    ├── init/             # 專案第一次 clone 後的初始化腳本
     ├── dev/              # 開發環境腳本
     ├── test/             # 測試環境腳本
     └── prod/             # 正式環境腳本
