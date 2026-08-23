@@ -16,7 +16,7 @@ repo/
 ├── Backend/              # 後端根目錄
 │   ├── src/
 │   │   ├── config/       # 環境、伺服器、資料庫與驗證設定
-│   │   ├── infrastructure/ # 後端基礎設施，包含 Database、Security、logger
+│   │   ├── infrastructure/ # 後端基礎設施，包含 Database、Security
 │   │   ├── modules/      # 包含後端各功能模組
 │   │   │   └── module_name/       # 單一功能模組目錄
 │   │   │       ├── routes/        # 定義模組的 API 路由與 HTTP endpoint
@@ -27,8 +27,7 @@ repo/
 │   │   ├── shared/       # 包含跨模組共用代碼
 │   │   └── server.ts     # 後端入口點
 │   ├── test/             # 後端測試入口
-│   │   ├── unit/         # 單元測試
-│   │   └── integration/  # 整合測試
+│   │   └──  unit/        # 單元測試
 │   └── package.json      
 ├── Frontend/             # 前端根目錄
 │   ├── public/          
@@ -66,6 +65,14 @@ Backend 採垂直拆分模組、模組內水平分層：Request → Route → Mi
 - Never 未經確認重構與當前任務無關的程式碼。
 - Never 忽略既有的型別、測試或資料一致性檢查。
 - Never 硬編碼敏感資訊
+
+## Unit Testing
+
+- `Backend/` 單元測試：先閱讀並遵循 `docs/unit-testing/backend.md`。
+- `Frontend/` 單元測試：先閱讀並遵循 `docs/unit-testing/frontend.md`。
+- 若測試工作同時涉及 `Frontend/` 與 `Backend/`，必須閱讀兩份單元測試文件。
+- 沿用既有測試框架、Mock、命名、目錄與慣例；與文件衝突時先指出差異，非必要不得自行改變測試架構或建立新慣例。
+- 後端修改後，於 `Backend/` 執行 `npm run check`；前端依其測試文件與既定工具鏈執行。
 
 ## Commit 規範
 
