@@ -16,13 +16,13 @@ fi
 
 case "$ENVIRONMENT" in
   development)
-    MIGRATION_SCRIPT="dev:db:migrate"
+    MIGRATION_SCRIPT="migrate:src"
     ;;
   test)
-    MIGRATION_SCRIPT="test:db:migrate"
+    MIGRATION_SCRIPT="migrate:src"
     ;;
   production)
-    MIGRATION_SCRIPT="prod:db:migrate"
+    MIGRATION_SCRIPT="migrate"
     ;;
   *)
     msg_error "不支援的 environment：$ENVIRONMENT"

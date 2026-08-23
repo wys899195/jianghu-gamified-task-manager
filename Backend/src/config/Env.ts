@@ -6,11 +6,6 @@ import 'dotenv/config';
 import { z } from 'zod';
 import type { StringValue } from 'ms';
 
-
-const envBoolean = z
-    .enum(['true', 'false'])
-    .transform((value) => value === 'true');
-
 const runtimeSchema = z.object({
     NODE_ENV: z.enum(['development', 'test', 'production']),
 });

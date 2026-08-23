@@ -49,7 +49,9 @@ A full-stack wuxia-inspired gamified task management app that turns real-life ac
 **本專案使用shell script來快速部署與運行，執行以下腳本前，請確認「執行環境與前置準備」所列環境與指令均已準備完成。**
 
 
-- Clone 本專案後，請先執行以下初始化專用腳本。此腳本會建立必要的 `.env` 檔案並安裝 Backend 與 Frontend 的依賴套件；執行過程中請依提示設定兩組新的資料庫密碼。
+- Clone 本專案後，請先執行以下初始化專用腳本。此腳本會建立必要的 `.env` 檔案並安裝前後端所需的套件。
+
+  - 腳本執行過程中請依提示設定 `MYSQL_ROOT_PASSWORD` 與 `MYSQL_PASSWORD`。密碼只能使用英文字母與數字（`A-Z`、`a-z`、`0-9`），若直接按 Enter，則可依提示確認使用預設資料庫密碼。
 
     ```sh
     sh/init/initialize_after_clone.sh

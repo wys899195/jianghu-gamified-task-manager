@@ -27,13 +27,13 @@ fi
 
 case "$ENVIRONMENT" in
   development)
-    SERVER_SCRIPT="dev:server"
+    SERVER_SCRIPT="dev"
     ;;
   test)
-    SERVER_SCRIPT="test:server"
+    SERVER_SCRIPT="start"
     ;;
   production)
-    SERVER_SCRIPT="prod:server"
+    SERVER_SCRIPT="start"
     ;;
   *)
     msg_error "不支援的 environment：$ENVIRONMENT"

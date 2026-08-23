@@ -7,19 +7,18 @@
     "type": "module",
     "main": "dist/server.js",
     "scripts": {
-        "dev:server": "tsx watch src/server.ts",
-        "dev:db:migrate": "tsx src/infrastructure/database/MigrationRunner.ts",
-        "dev:start": "npm run dev:db:migrate && npm run dev:server",
-        "test:db:migrate": "tsx src/infrastructure/database/MigrationRunner.ts",
-        "test": "node --test",
-        "test:server": "node dist/server.js",
-        "prod:db:migrate": "node dist/infrastructure/database/MigrationRunner.js",
-        "prod:server": "node dist/server.js",
-        "prod:start": "npm run prod:db:migrate && npm run prod:server",
+        "dev": "tsx watch src/server.ts",
+        "start": "node dist/server.js",
+        "migrate": "node dist/infrastructure/database/MigrationRunner.js",
+        "migrate:src": "tsx src/infrastructure/database/MigrationRunner.ts",
+        "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js",
+        "test:watch": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --watch",
+        "test:coverage": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --coverage",
+        "lint": "eslint .",
         "clean": "rm -rf dist",
         "build": "npm run clean && tsc",
         "typecheck": "tsc --noEmit",
-        "check": "npm run typecheck && npm run test"
+        "check": "npm run lint && npm run typecheck && npm run test"
     },
     "dependencies": {
         "bcrypt": "^6.0.0",
@@ -33,14 +32,21 @@
         "zod": "^4.4.3"
     },
     "devDependencies": {
+        "@eslint/js": "^10.0.1",
         "@types/bcrypt": "^6.0.0",
         "@types/cookie-parser": "^1.4.10",
         "@types/express": "^5.0.6",
+        "@types/jest": "^30.0.0",
         "@types/jsonwebtoken": "^9.0.10",
         "@types/node": "^24.13.3",
+        "eslint": "^10.9.0",
+        "globals": "^17.11.0",
+        "jest": "^30.4.2",
+        "ts-jest": "^29.4.12",
         "tslib": "^2.8.1",
         "tsx": "^4.23.9",
-        "typescript": "^6.0.3"
+        "typescript": "^6.0.3",
+        "typescript-eslint": "^8.67.0"
     },
     "allowScripts": {
         "esbuild@0.28.1": true,

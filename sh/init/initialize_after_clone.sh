@@ -10,6 +10,7 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 # 定義根目錄環境設定檔與初始化預設值。
 ROOT_ENV_FILE="$PROJECT_ROOT/.env"
 DEFAULT_DATABASE_PASSWORD="000000"
+PASSWORD_FORMAT_HINT="密碼僅可使用英文字母與數字（A-Z、a-z、0-9）"
 TERMINAL_SETTINGS=""
 
 # 把終端機恢復成原本的輸入狀態。
@@ -76,6 +77,20 @@ read_secret() {
   fi
 }
 
+# 檢查密碼是否只包含英文字母與數字。
+is_safe_secret() {
+  secret_to_validate="$1"
+
+  case "$secret_to_validate" in
+    *[!A-Za-z0-9]*)
+      return 1
+      ;;
+    *)
+      return 0
+      ;;
+  esac
+}
+
 # 確認密碼欄位並寫入根目錄.env檔。
 prompt_secret_if_empty() {
   env_key="$1"
@@ -83,7 +98,11 @@ prompt_secret_if_empty() {
   current_value="$(get_env_value "$ROOT_ENV_FILE" "$env_key")"
 
   if [ -n "$current_value" ]; then
-    return 0
+    if is_safe_secret "$current_value"; then
+      return 0
+    fi
+
+    msg_error "$env_key 已包含不支援的字元，請重新設定。$PASSWORD_FORMAT_HINT。"
   fi
 
   if [ ! -t 0 ] || [ ! -t 1 ]; then
@@ -121,7 +140,19 @@ prompt_secret_if_empty() {
       esac
     fi
 
+    if ! is_safe_secret "$first_secret"; then
+      msg_error "$env_key 含有不支援的字元，請重新設定。$PASSWORD_FORMAT_HINT。"
+      continue
+    fi
+
     read_secret "請再次輸入 $env_key："
+    if ! is_safe_secret "$secret_value"; then
+      msg_error "$env_key 含有不支援的字元，請重新設定。$PASSWORD_FORMAT_HINT。"
+      first_secret=""
+      secret_value=""
+      continue
+    fi
+
     if [ "$first_secret" != "$secret_value" ]; then
       msg_error "兩次輸入的密碼不一致，請再試一次並重新設定 $env_key。"
       first_secret=""
@@ -151,8 +182,8 @@ if [ ! -f "$ROOT_ENV_FILE" ]; then
 fi
 
 # 確認 MySQL root 與應用程式密碼。
-prompt_secret_if_empty "MYSQL_ROOT_PASSWORD" "請輸入 MySQL root 密碼（若不輸入直接按 Enter 將使用預設密碼「${DEFAULT_DATABASE_PASSWORD}」）："
-prompt_secret_if_empty "MYSQL_PASSWORD" "請輸入 MySQL 後端資料庫專用密碼（若不輸入直接按 Enter 將使用預設密碼「${DEFAULT_DATABASE_PASSWORD}」）："
+prompt_secret_if_empty "MYSQL_ROOT_PASSWORD" "請輸入 MySQL root 密碼（若不輸入直接按 Enter 將使用預設密碼「${DEFAULT_DATABASE_PASSWORD}」；$PASSWORD_FORMAT_HINT）："
+prompt_secret_if_empty "MYSQL_PASSWORD" "請輸入 MySQL 後端資料庫專用密碼（若不輸入直接按 Enter 將使用預設密碼「${DEFAULT_DATABASE_PASSWORD}」；$PASSWORD_FORMAT_HINT）："
 
 # 建立後端.env檔。
 if [ -f "Backend/.env.example" ] && [ ! -f "Backend/.env" ]; then

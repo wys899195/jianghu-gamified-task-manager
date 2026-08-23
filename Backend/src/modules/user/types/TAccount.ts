@@ -3,10 +3,6 @@
 // 提供認證資料與個人資料在各層之間傳遞時使用。
 // ========================================
 
-import type {
-  RegisterRequest,
-} from '../requestSchemas/AuthRequestSchema.js';
-
 /**
  * 登入驗證所需要的帳號資料。
  */
