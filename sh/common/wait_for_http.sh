@@ -1,5 +1,6 @@
 #!/bin/sh
 # 等待指定 HTTP endpoint 可正常回應。
+# Internal helper：由服務啟動流程呼叫，不作為日常入口直接執行。
 
 set -eu
 

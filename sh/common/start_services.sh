@@ -1,5 +1,6 @@
 #!/bin/sh
 # 啟動指定環境的 Backend 與 Frontend，不執行資料庫部署或 migration。
+# Internal helper：由 development 與 test 的 deploy 或 restart 入口呼叫，不作為日常入口直接執行。
 
 set -eu
 
@@ -7,6 +8,7 @@ ENVIRONMENT="${1:?environment is required}"
 PROJECT_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 
 . "$PROJECT_ROOT/sh/common/msg_color.sh"
+. "$PROJECT_ROOT/sh/common/runtime_paths.sh"
 
 case "$ENVIRONMENT" in
   development)
@@ -28,7 +30,7 @@ case "$ENVIRONMENT" in
 esac
 
 export APP_ENV
-LOG_DIR="$PROJECT_ROOT/logs"
+LOG_DIR="$RUNTIME_DIR"
 BACKEND_LOG="$LOG_DIR/${LOG_PREFIX}-backend.log"
 FRONTEND_LOG="$LOG_DIR/${LOG_PREFIX}-frontend.log"
 BACKEND_PID=""

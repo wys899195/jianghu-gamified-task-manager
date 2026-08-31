@@ -1,5 +1,6 @@
 #!/bin/sh
 # 載入專案根目錄的 .env，供各環境 shell wrapper 共用環境設定。
+# Internal helper：由其他 shell script 載入根目錄環境設定，不作為日常入口直接執行。
 
 set -eu
 

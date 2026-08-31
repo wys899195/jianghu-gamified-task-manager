@@ -1,14 +1,17 @@
 #!/bin/sh
 # 依根目錄 APP_ENV 注入 NODE_ENV，並啟動對應的 Backend server script。
+# Internal helper：由各環境的 Backend 啟動入口呼叫，不作為日常入口直接執行。
 
 set -eu
 
 ENVIRONMENT="${1:?environment is required}"
 PROJECT_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
-PID_FILE="$PROJECT_ROOT/logs/${ENVIRONMENT}-backend.pid"
 BACKEND_ENV_FILE="$PROJECT_ROOT/Backend/.env"
 
 . "$PROJECT_ROOT/sh/common/msg_color.sh"
+. "$PROJECT_ROOT/sh/common/runtime_paths.sh"
+
+PID_FILE="$(get_service_pid_file "$ENVIRONMENT" backend)"
 
 if [ ! -f "$BACKEND_ENV_FILE" ]; then
   msg_error "找不到 Backend/.env：$BACKEND_ENV_FILE"

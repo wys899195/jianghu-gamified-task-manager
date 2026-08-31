@@ -1,5 +1,6 @@
 #!/bin/sh
 # 停止指定環境的 Backend 或 Frontend，不影響其他環境服務。
+# Internal helper：由各環境的 service 停止入口呼叫，不作為日常入口直接執行。
 
 set -eu
 
@@ -8,6 +9,7 @@ SERVICE="${2:?service is required}"
 PROJECT_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 
 . "$PROJECT_ROOT/sh/common/msg_color.sh"
+. "$PROJECT_ROOT/sh/common/runtime_paths.sh"
 
 case "$ENVIRONMENT" in
   development|test|production) ;;
@@ -31,4 +33,5 @@ case "$SERVICE" in
 esac
 
 . "$PROJECT_ROOT/sh/common/process_control.sh"
-stop_pid_file "$PROJECT_ROOT/logs/${ENVIRONMENT}-${SERVICE}.pid" "$PROCESS_MARKER"
+PID_FILE="$(get_service_pid_file "$ENVIRONMENT" "$SERVICE")"
+stop_pid_file "$PID_FILE" "$PROCESS_MARKER"

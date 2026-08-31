@@ -1,5 +1,6 @@
 #!/bin/sh
 # 提供可在終端機使用的錯誤、警告與成功訊息格式。
+# Internal library：必須由其他 shell script 以 . 載入，不可直接執行。
 
 msg_error() {
   if [ -t 2 ] && [ -z "${NO_COLOR:-}" ]; then

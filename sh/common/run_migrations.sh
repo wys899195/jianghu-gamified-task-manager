@@ -1,5 +1,6 @@
 #!/bin/sh
 # 依根目錄 APP_ENV 選擇並執行 Backend 對應的資料庫 migration。
+# Internal helper：由環境資料庫部署流程呼叫，不作為日常入口直接執行。
 
 set -eu
 
