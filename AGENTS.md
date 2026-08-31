@@ -35,6 +35,11 @@ repo/
 ├── Database/
 │   └── migrations/       # SQL migrations，用於管理資料庫 Schema 變更，命名是有序的，如001_xxx.sql
 ├── API-Tests             # API 測試 (Postman CLI)
+├── docs/                 # 現行專案設計與規範
+│   ├── product/          # 產品定位與 Domain / Feature 設計
+│   ├── architecture/     # 系統與技術架構
+│   ├── testing/          # 測試策略與各測試類型規範
+│   └── workflow/         # 需求與開發流程
 └── sh/                   # 專案部署、開發、測試腳本
     ├── common/           # 跨環境共用 shell helper
     ├── init/             # 專案第一次 clone 後的初始化腳本
@@ -44,6 +49,11 @@ repo/
 ```
 
 Backend 採垂直拆分模組、模組內水平分層：Request → Route → Middleware → Controller → Service → Repository → Database。
+
+## Documentation
+
+- 現行專案設計與規範位於 `docs/`；執行任務前先讀 `docs/README.md`，再依任務範圍閱讀相關文件。
+- 子目錄有 `README.md` 時先讀該 README；文件與實作／設定衝突時先指出差異，不自行推測。
 
 ## File Search Strategy
 
@@ -66,13 +76,12 @@ Backend 採垂直拆分模組、模組內水平分層：Request → Route → Mi
 - Never 忽略既有的型別、測試或資料一致性檢查。
 - Never 硬編碼敏感資訊
 
-## Unit Testing
+## Testing
 
-- `Backend/` 單元測試：先閱讀並遵循 `docs/unit-testing/backend.md`。
-- `Frontend/` 單元測試：先閱讀並遵循 `docs/unit-testing/frontend.md`。
-- 若測試工作同時涉及 `Frontend/` 與 `Backend/`，必須閱讀兩份單元測試文件。
-- 沿用既有測試框架、Mock、命名、目錄與慣例；與文件衝突時先指出差異，非必要不得自行改變測試架構或建立新慣例。
-- 後端修改後，於 `Backend/` 執行 `npm run check`；前端依其測試文件與既定工具鏈執行。
+- 測試工作先閱讀 `docs/testing/testing-strategy.md`。
+- Backend 單元測試另閱讀 `docs/testing/backend-unit-testing.md`；Frontend 單元測試另閱讀 `docs/testing/frontend-unit-testing.md`；API System Test 另閱讀 `docs/testing/api-testing.md`。
+- 沿用既有測試框架、Mock、命名、目錄與慣例；文件與實作衝突時先指出差異，非必要不得自行改變測試架構或建立新慣例。
+- 後端修改後，於 `Backend/` 執行 `npm run check`；前端依既定工具鏈執行。
 
 ## Commit 規範
 

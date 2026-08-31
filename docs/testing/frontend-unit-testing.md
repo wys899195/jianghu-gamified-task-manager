@@ -1,6 +1,6 @@
 # Frontend Unit Testing
 
-本文件規範 Frontend 的單元測試。Frontend 目前尚未建立可執行的測試框架或測試檔；因此本文件定義測試工作開始前的判斷與完成後必須遵循的原則，不指定未導入的函式庫、mock API 或目錄結構。
+本文件規範 Frontend 的單元測試；整體測試分工見 `testing-strategy.md`。Frontend 目前尚未建立可執行的測試框架或測試檔；因此本文件定義測試工作開始前的判斷與完成後必須遵循的原則，不指定未導入的函式庫、mock API 或目錄結構。
 
 ## 工具鏈與執行
 

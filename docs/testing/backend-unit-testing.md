@@ -120,4 +120,4 @@ test('describes observable behavior', async () => {
 - 薄型 Controller 與 Route：優先由 API 測試驗證 Request、Response、Cookie、validation middleware 與 error handler，不建立大量 mock-heavy unit test。
 - Repository 與 MySQL：不在 unit test 直接驗證 SQL。以啟動後端並連接專用測試資料庫的 Postman/API 測試驗證 migration、SQL、constraint 與完整 HTTP 流程。
 
-本專案目前可維持「Unit test + Postman/API test」兩層。API 測試須使用可重建的專用測試資料庫、先執行 migration，且不得連接正式資料庫；日後若 transaction、併發或 SQL 除錯成本提高，再評估獨立 Repository integration test。
+本專案目前維持「Unit Test + API System Test」兩層主要自動化測試。API System Test 細則見 `api-testing.md`；測試須使用可重建的專用測試資料庫、先執行 migration，且不得連接 development / production database。日後若 transaction、併發或 SQL 除錯成本提高，再評估獨立 Repository / DB Integration Test。
