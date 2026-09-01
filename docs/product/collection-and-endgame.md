@@ -1,5 +1,7 @@
 # 收藏、圖鑑與終局設計
 
+本文件擁有 Collection／Codex 的瀏覽語義與長期 endgame，不擁有 Task Activity、武學進度或 acquisition provenance 的 canonical data。除「提案」「未定」與「延期」內容外，其餘規則為已確認。
+
 ## 1. 武學圖鑑
 
 武學圖鑑是核心長期收藏層，但開發優先度低於 Task 核心流程。
@@ -34,7 +36,7 @@
 
 V1 沒有真正的持有／消耗／交易需求，因此不提前建立通用 Item / Inventory Domain。
 
-## 3. 奇珍收藏
+## 3. 奇珍收藏（延期）
 
 奇珍可以作為未來第二收藏軸，但不需要因此建立：
 
@@ -68,7 +70,13 @@ V1 沒有真正的持有／消耗／交易需求，因此不提前建立通用 I
 
 ## 5. 個人修行史
 
-武學可保留與真實 Task／修為來源的個人歷史，例如：
+個人修行史是組合既有資料的 read model：
+
+- Task Activity facts 由 [`task-system.md`](task-system.md) 擁有。
+- 武學修煉、突破與大成狀態由 [`martial-progression.md`](martial-progression.md) 擁有。
+- 武學取得來源由 [`martial-acquisition-and-exploration.md`](martial-acquisition-and-exploration.md) 擁有。
+
+Collection／Codex 可以組合並展示：
 
 - 初習日期。
 - 修煉次數。
@@ -76,9 +84,9 @@ V1 沒有真正的持有／消耗／交易需求，因此不提前建立通用 I
 - 突破與大成時間。
 - task completion → cultivation allocation provenance。
 
-主修自動分配可以記錄來源；手動修為池分配是否需要追溯到特定 Task Activity 尚未定案。
+本文件不建立另一套可獨立寫入的 History。主修自動分配可以記錄來源；手動修為池分配是否需要追溯到特定 Task Activity 尚未定案。
 
-## 6. 圖鑑 UI 方向
+## 6. 圖鑑 UI 方向（提案）
 
 桌面／平板橫屏可使用 Master–Detail：
 
@@ -91,7 +99,7 @@ V1 沒有真正的持有／消耗／交易需求，因此不提前建立通用 I
 
 此 UI 方向應等武學資料模型與實際畫面需求穩定後再落地。
 
-## 7. 自創武學 Endgame
+## 7. 自創武學 Endgame（延期）
 
 自創武學是長期 endgame，不屬於 V1。
 
@@ -110,7 +118,7 @@ V1 沒有真正的持有／消耗／交易需求，因此不提前建立通用 I
 - 由系統控制進度需求、修煉成本與其他會影響平衡的規則。
 - 不因使用者沒有建立自創武學而形成強迫完成感。
 
-## 8. Open Questions
+## 8. 未定問題
 
 - 初始提供多少入門武學。
 - 初始武學類別。

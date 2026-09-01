@@ -1,5 +1,9 @@
 # Task 系統設計
 
+本文件擁有 Task 的規劃、執行、進度、Activity facts、Reflection 與 Task Reward 計算。武學收到 Reward 後的修為分配與升級由 [`martial-progression.md`](martial-progression.md) 負責。
+
+除「提案」與「未定問題」外，其餘規則為已確認。
+
 ## 1. Responsibility
 
 Task 系統負責現實行動的規劃、執行、進度、歷史與 Reflection。
@@ -48,12 +52,6 @@ metricType
 - 每週 LeetCode 5 題：weekly cycle 內累積至 5。
 - 一次性任務：`recurrence = none`。
 - Habit 不建立獨立 metric type，可表達為無限期 recurring task。
-
-### Open Questions
-
-- Custom recurrence 是否支援每 N 天。
-- 是否支援每週特定日。
-- 是否支援每月特殊日期規則。
 
 基礎 daily / weekly / monthly / none 優先。
 
@@ -118,14 +116,7 @@ Today List 顯示今天應處理的任務；另外允許一天設定 0～1 個�
 → 輕量武學進展
 ```
 
-### Open Questions
-
-- 到期任務是否自動進 Today。
-- recurring task 如何自動展開。
-- 未完成任務是否 rollover。
-- Today List 的最終自動產生規則。
-
-## 6. 每日狀態
+## 6. 每日狀態（提案）
 
 已確立需要讓系統適應每日精力波動，但規則與資料模型尚未完成。
 
@@ -136,14 +127,6 @@ Today List 顯示今天應處理的任務；另外允許一天設定 0～1 個�
 - 異常日：重大行程或突發事件時允許延後、暫停或重新安排。
 
 每日狀態應調整「今日要求／最低完成標準」，不應直接提高單一任務 Reward。
-
-### Open Questions
-
-- 如何選擇／切換狀態。
-- 是否每天手動設定。
-- 是否影響完成率或連續紀錄。
-- recurring task 如何處理。
-- Schema 應使用獨立 entity 或欄位。
 
 ## 7. Progress 與 TaskCycle
 
@@ -161,7 +144,7 @@ Today List 顯示今天應處理的任務；另外允許一天設定 0～1 個�
 
 ### 7.3 Task → TaskCycle → TaskActivityRecord
 
-目前採三層概念：
+已確認採三層概念；實際 Schema 與最終命名仍未定：
 
 - `Task`：目前規則，例如名稱、metric type、target、recurrence、difficulty、importance。
 - `TaskCycle`：一個具體執行週期。
@@ -219,7 +202,7 @@ Streak 暫不加入 V1。
 
 ## 11. Reward 計算邊界
 
-目前 Reward 方向：
+已確認的 Reward 結構：
 
 ```text
 rawReward = difficultyBase + importanceBonus
@@ -232,17 +215,31 @@ finalReward = rawReward × completionRatio
 - importance 是 bonus。
 - completion ratio 是 multiplier。
 - 不使用 difficulty × importance 的全乘法。
-- AI 不作為核心 Reward 的唯一決策者。
 - 核心 Reward 必須 deterministic、可測試、可重現。
 
 一般 +0／重要 +1／關鍵 +2 等數字只是平衡示例，不是最終定案。
 
-### Open Questions
+Task 系統只產生可重現的 Reward 結果；主修武學、修為池與 overflow 如何消費該結果不屬於本文件。
 
-- difficulty base 的精確數值。
-- importance bonus 的精確數值。
-- rounding。
-- Undo / rollback 對已發 Reward、TaskCycle 與武學突破的 transaction semantics。
-- 是否保留「基礎屬性」；目前傾向若保留則作為行為分布統計，而不是對真實能力的評價。
-- `TaskCycle` / `TaskActivityRecord` 最終 Schema。
-- Activity History / provenance 最低必要欄位。
+## 12. 未定問題
+
+### Recurrence
+
+- Custom recurrence 是否支援每 N 天、每週特定日或每月特殊日期。
+
+### Today 與每日狀態
+
+- 到期任務是否自動進 Today。
+- Recurring task 如何自動展開與 rollover。
+- Today List 的最終自動產生規則。
+- 每日狀態如何選擇／切換，是否每日手動設定。
+- 每日狀態是否影響完成率、連續紀錄或 recurring task。
+- 每日狀態使用獨立 entity 或欄位。
+
+### Progress、History 與 Reward
+
+- difficulty base、importance bonus 與 rounding 的精確數值。
+- Undo／rollback 對已發 Reward、TaskCycle 與武學突破的 transaction semantics。
+- 是否保留「基礎屬性」；若保留，傾向作為行為分布統計，而不是對真實能力的評價。
+- `TaskCycle`／`TaskActivityRecord` 最終 Schema 與命名。
+- Activity History／provenance 的最低必要欄位。

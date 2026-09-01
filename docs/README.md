@@ -1,49 +1,67 @@
 # Project Documentation
 
-`docs/` 保存目前專案的現行設計與規範。這些文件是 GPT 與 Codex 進行後續設計、實作與檢閱時的主要專案知識來源。
+`docs/` 保存專案的產品設計、架構決策、API 契約、測試策略、開發流程與程式碼慣例，包含已確認規則以及明確標示的提案、未定與延期內容。這些文件是 Agent 進行後續設計、實作與檢閱時的主要專案知識來源，亦供開發者查閱。
+
+## 文件責任與權威邊界
+
+不同資訊由不同來源負責：
+
+| 資訊類型 | 權威來源 |
+|---|---|
+| 產品目標、Domain 行為與已確認規則 | `docs/product/` |
+| 架構邊界與技術決策 | `docs/architecture/` |
+| 對外 HTTP 契約 | `docs/api/` |
+| 測試分工與測試實作規範 | `docs/testing/` |
+| 需求、Git 與開發流程 | `docs/workflow/` |
+| Repository、程式碼與檔案慣例 | `docs/conventions/` |
+| 目前實際存在的程式流程、Schema、設定值與可執行命令 | 程式碼、`Database/migrations/`、設定檔與 `package.json` |
+| Agent 的閱讀、搜尋、驗證與安全操作方式 | `AGENTS.md` |
+
+`AGENTS.md` 是文件的使用者，不是產品、架構或開發規範的來源；`docs/` 不反向依賴 `AGENTS.md`。
+
+文件與程式碼／設定不一致時，先指出具體差異並確認：不得自行把尚未確認的實作當成新規格，也不得為了符合舊文件而覆蓋已確認的新實作。
+
+## 狀態用語
+
+文件中的規則使用以下狀態：
+
+- **已確認**：可作為設計、實作與測試依據。
+- **提案**：已有偏好方向，但尚未取得實作授權，不可直接視為規格。
+- **未定**：仍需補充需求或做出選擇。
+- **延期**：已確認不屬於目前版本範圍。
+
+「目前實作」只描述 repository 中可以直接驗證的狀態。若只代表設計偏好，必須標為「提案」，不得使用容易混淆的「目前方向」。
 
 ## Categories
 
-### `product/`
+### [`product/`](product/README.md)
 
-產品定位與 Domain / Feature 設計。
+產品定位、Domain／Feature 設計與版本範圍。閱讀順序及文件責任由 category README 管理。
 
-- `product-principles.md`：產品定位、品牌、核心產品原則與 V1 Scope Guardrails。
-- `task-system.md`：Task、Today、Progress、Activity History、Reflection 與 Reward。
-- `martial-progression.md`：武學傳承、殘章、境界、修為與主修。
-- `martial-acquisition-and-exploration.md`：機緣、尋訪、多來源武學取得、探索與師承。
-- `collection-and-endgame.md`：圖鑑、Collection / Inventory 邊界、個人修行史與自創武學。
+### [`architecture/`](architecture/README.md)
 
-### `architecture/`
+現行架構、跨層責任、基礎設施與演進決策。精確 runtime 設定仍以實際設定檔為準。
 
-系統與技術架構。
+### `api/`
 
-- `system-architecture.md`：技術棧、Backend 分層、Modular Monolith、AI 與 Logging 方向。
-- `authentication.md`：Access Token、Refresh Session、Auth API 與 Session lifecycle。
-- `request-validation.md`：Zod Request Schema、Validation Middleware 與 400 / 401 邊界。
-- `mysql-infrastructure.md`：MySQL 容器化、connection pool、backup 與 migration 相關方向。
-- `data-ownership.md`：Domain Data Ownership、JOIN boundary 與 database-per-service 演進。
-- `deployment-evolution.md`：Docker Compose、Kubernetes、微服務與 repository 演進。
+對外 HTTP API 契約。目前包含：
 
-### `testing/`
+- [`authentication.md`](api/authentication.md)：Auth routes、Request／Response、Cookie 與公開錯誤行為。
 
-測試策略與各測試類型的實作規範。
+### [`testing/`](testing/README.md)
 
-- `testing-strategy.md`：整體測試分工、案例設計、Coverage 與測試工作流。
-- `backend-unit-testing.md`：Backend Unit Test、Jest ESM、Mock、fixture 與目錄規範。
-- `frontend-unit-testing.md`：Frontend Unit Test 原則與工具鏈建立前的限制。
-- `api-testing.md`：Postman CLI、Data-Driven API Test、Repository / DB 驗證與完整 Backend HTTP flow。
+整體測試策略與 Backend Unit、Frontend Unit、API System Test 的實作規範。
 
 ### `workflow/`
 
-需求與開發流程。
+- [`development-workflow.md`](workflow/development-workflow.md)：需求、Backlog、Issue、Branch、PR 與 Commit 流程。
 
-- `development-workflow.md`：User Story、Use Case、Acceptance Criteria、Backlog、Issue、Branch 與 PR。
+### [`conventions/`](conventions/README.md)
+
+Repository 結構、程式碼與專案檔案的撰寫慣例。
 
 ## Reading Rule
 
-依目前任務閱讀相關文件，不需要一次載入全部 docs。
+先讀本文件確認權威來源，再依任務讀取相關 category README 與詳細文件；不需要一次載入全部 docs。
 
-若某個 category 未來增加多個子領域、文件數量明顯增加或需要特定閱讀順序，再在該 category 建立子目錄與 `README.md`。
-
-文件與實際程式碼／設定不一致時，先指出差異並確認，不自行把未確認內容當成現行規格。
+詳細文件只維護自身責任。需要其他領域資訊時使用連結，不複製另一份規則；摘要只能說明依賴關係，不得建立第二份可獨立修改的規格。

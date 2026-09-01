@@ -1,5 +1,7 @@
 # 系統架構
 
+本文件是現行系統架構總覽。Repository 放置與命名規範見 [`../conventions/project-structure.md`](../conventions/project-structure.md)；未來部署演進另見 [`deployment-evolution.md`](deployment-evolution.md)。
+
 ## 1. 現行技術棧
 
 ```text
@@ -22,13 +24,9 @@ Package Manager
 
 NestJS、Spring Boot、Maven、Prisma 等舊討論方案不是目前開發方案。
 
-## 2. Repository 型態
+## 2. Repository 與 Backend 架構
 
-目前為單一 Git Repository 的前後端分離專案。
-
-主要結構以 `AGENTS.md` 與實際 repository 為準。
-
-## 3. Backend 架構
+目前是單一 Git Repository 的前後端分離 Modular Monolith。
 
 Backend 採：
 
@@ -46,113 +44,57 @@ Request
 → Database
 ```
 
-典型模組：
+模組目錄與各層檔案放置由 [`Project Structure 規範`](../conventions/project-structure.md) 統一維護，本文件不複製完整 repository tree。
 
-```text
-Backend/src/modules/<module_name>/
-├── routes/
-├── middleware/
-├── controllers/
-├── services/
-└── repositories/
-```
+## 3. 各層責任
 
-避免在全專案只依技術層建立大型 controllers / services / repositories 目錄。
-
-## 4. 各層責任
-
-- Schema：定義 Request 格式是否合法。
-- Middleware：Request 驗證與前置處理。
-- Controller：處理 HTTP Request / Response 並呼叫 Service。
+- Request Schema：定義 transport input 格式是否合法。
+- Middleware：執行 Request 驗證、身份驗證與其他前置處理。
+- Controller：處理 HTTP Request／Response 並呼叫 Service。
 - Service：業務規則與 application flow。
-- Repository：Database 存取。
-- Database：資料完整性的最後防線。
+- Repository：該 Domain 擁有資料的 Database 存取。
+- Database：透過 schema 與 constraint 提供資料完整性的最後防線。
 
-錯誤處理目前使用：
+延伸規範：
 
-- `ServiceError`。
-- `ErrorHttpStatusMap`。
-- `ApiErrorHandler`。
-- Controller `catch` 後交由 `next(error)`。
-- Error Handler 位於所有 API Route 後方。
+- Request Validation：[`request-validation.md`](request-validation.md)。
+- API Error Handling：[`api-error-handling.md`](api-error-handling.md)。
+- Data Ownership：[`data-ownership.md`](data-ownership.md)。
+- MySQL 與 Migration：[`mysql-infrastructure.md`](mysql-infrastructure.md)。
 
-## 5. Schema Migration
+## 4. Modular Monolith Guardrails
 
-Database schema 由 `Database/migrations/` 的有序 SQL migrations 管理。
-
-規則：
-
-- 已執行 migration 不修改。
-- Schema 變更新增 migration。
-- 不硬編碼敏感資訊。
-- 不把未確認需求直接寫成 schema 規格。
-
-## 6. Modular Monolith
-
-現階段優先維持 Modular Monolith。
-
-核心原則：
+已確認原則：
 
 - 先建立清楚的業務模組邊界。
 - 模組內維持既定分層。
-- 跨模組依賴必須有明確責任。
+- 跨模組依賴必須有明確 owner。
 - 模組邊界是候選 service boundary，不代表未來一定拆成 service。
 - 不因未來可能微服務化而提前引入分散式系統成本。
 
-目前不為未來微服務化提前建立：
+目前不建立：
 
 - 每個模組獨立部署。
-- Kafka / RabbitMQ。
-- API Gateway。
-- Service Discovery。
+- Kafka／RabbitMQ。
+- API Gateway／Service Discovery。
 - 分散式 Transaction。
-- 每個 domain 一個 service。
+- 每個 Domain 一個 service 或 database。
 
-Database ownership 與未來拆分策略由 `data-ownership.md` 管理；部署演進由 `deployment-evolution.md` 管理。
+未來 service 與 database 拆分條件分別由 [`deployment-evolution.md`](deployment-evolution.md) 與 [`data-ownership.md`](data-ownership.md) 管理。
 
-## 7. AI Integration Direction
+## 5. AI Integration Guardrails
 
-若加入外部 AI API：
+這些是已接受的安全邊界，不代表外部 AI API 已完成：
 
-- 由 Backend 串接。
-- Frontend 不直接持有 API Key。
+- 外部 AI API 由 Backend 串接；Frontend 不持有 API key。
 - Backend 負責 timeout、retry、rate limit、provider abstraction、logging 與 error handling。
+- AI 可協助任務文字、回顧、摘要、文案與非關鍵建議。
+- AI 不參與核心交易狀態、不可逆資料、資料一致性或 deterministic Reward 計算。
 
-AI 適合：
+Provider、資料保留與實際功能仍屬未定，確認前不得從本節推導實作。
 
-- 任務文字輔助。
-- 回顧與摘要。
-- 文案生成。
-- 非關鍵建議。
+## 6. Logging Guardrails
 
-AI 不應直接決定：
+已確認方向是先建立可搜尋、可分析並適當去識別的結構化 Log。依事件可包含 timestamp、level、module、request／trace identifier、user identifier、event type、duration 與 error code。
 
-- 核心交易狀態。
-- 關鍵資料一致性。
-- 不可逆業務資料。
-- 需要 deterministic 的核心計算。
-
-## 8. Logging Direction
-
-初期優先建立可搜尋、可分析的結構化 Log。
-
-常見欄位：
-
-- timestamp。
-- level。
-- module。
-- request / trace identifier。
-- 適當去識別的 user identifier。
-- event type。
-- duration。
-- error code。
-
-可依需求區分：
-
-- System Log。
-- Request Log。
-- Business Log。
-- AI Log。
-- Audit Log。
-
-Elasticsearch 屬後期集中式 Log 搜尋與分析工具，不取代 MySQL 業務資料庫。
+System、Request、Business、AI、Audit Log 是可依需求區分的類型，不代表目前全部存在。Elasticsearch 只屬後期集中式搜尋提案，不取代 MySQL 業務資料庫。

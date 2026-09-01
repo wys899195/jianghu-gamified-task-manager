@@ -1,123 +1,75 @@
-# 部署與服務演進
+# 部署與 Service 演進
 
-## 1. Target Evolution
+本文件只定義未來 runtime、deployment 與 service 邊界的演進順序。Database ownership 與 physical database separation 由 [`data-ownership.md`](data-ownership.md) 負責。
 
-目前演進方向：
+## 1. 已確認策略
 
 ```text
-單體
-→ 前後端容器化
+Host 上的 Modular Monolith
+→ Backend / Frontend images
 → Docker Compose 整合
-→ Kubernetes
-→ 後端逐步微服務化
-→ 視需求 database-per-service
+→ 視需求導入 Kubernetes
+→ 只有在邊界與維運需求成立時拆 service
 ```
 
-目前不直接拆微服務，也不提前建立多個 MySQL instance。
+- 目前不直接拆微服務。
+- 容器化、Database 拆分與 Kubernetes 不在同一階段同時進行。
+- 是否拆 service 由實際 ownership、部署、負載或故障隔離需求決定，不把演進圖當成必然時程。
 
-## 2. Docker → Compose → Kubernetes
+## 2. Docker Compose 階段
 
-採用：
+Compose 用來驗證：
 
-```text
-Local modular monolith
-→ Docker image
-→ Docker Compose
-→ Kubernetes
-```
-
-Compose 階段用來先驗證：
-
-- network。
-- environment。
+- network 與 service name resolution。
+- environment injection。
 - persistent storage。
-- service discovery。
 - image runtime。
+- healthcheck 與 service startup dependency。
+- Backend、Frontend、MySQL 的完整整合。
 
-具體 Compose service、port、volume、healthcheck 等設定以實際 `compose.yaml` 為準。
+精確 service、port、volume、environment 與 healthcheck 由 `docker-compose.yaml` 表達，本文件不建立第二份設定。
 
-未來同一批 image 可由：
+## 3. Kubernetes 採用條件
 
-```text
-Local / integration → Docker Compose
-Production          → Kubernetes
-```
+只有在 deployment、scaling、recovery 或 environment 管理複雜度足以支持其成本時才導入 Kubernetes。屆時再依實際需求設計：
 
-管理。
+- `Deployment`／`Service`。
+- `ConfigMap`／`Secret`。
+- `Ingress`。
+- readiness／liveness probe。
+- stateful workload 或 managed database 的連線方式。
 
-Kubernetes 階段再引入：
+上述資源是候選能力，不代表 manifests 已存在。
 
-- `Deployment`
-- `Service`
-- `ConfigMap`
-- `Secret`
-- `PersistentVolumeClaim`
-- `Ingress`
-- readiness / liveness probe
+## 4. Repository Strategy
 
-不要同時進行：
-
-```text
-單體拆微服務
-+ Docker 化
-+ DB 拆分
-+ Kubernetes
-```
-
-## 3. Repository Strategy
-
-即使未來拆成多個 service，目前仍適合 monorepo。
-
-未來可能演進成：
-
-```text
-repo/
-├── apps/
-│   └── frontend/
-├── services/
-│   ├── user-service/
-│   ├── task-service/
-│   └── martial-service/
-├── packages/
-└── infrastructure/
-```
-
-service names 目前只是示意，不代表正式 service boundary。
-
-只有出現以下實際需求時才考慮 polyrepo：
+目前維持 monorepo。未來即使出現多個 service，也優先在同一 repository 管理，除非出現：
 
 - 不同團隊 ownership。
-- 權限隔離。
-- release cycle 完全不同。
-- monorepo 已造成維運問題。
+- 權限隔離需求。
+- 完全不同的 release cycle。
+- monorepo 已造成明確維運問題。
 
-## 4. Current Non-Goals
+`apps/`、`services/`、`packages/` 等未來 tree 只可在正式 service boundary 確認後設計；不在本文件預先固定 `user-service`、`task-service` 等名稱。
 
-以下不能視為已完成：
-
-- Backend / Frontend 已容器化。
-- 已建立 Kubernetes manifests。
-- 已拆微服務。
-- 已拆多個 database。
-- 已決定正式 service boundary。
-- 已決定 migration framework。
-- 已建立 production DB topology。
-
-## 5. Recommended Order
+## 5. 建議執行順序
 
 ```text
-1. 確認 MySQL Compose / volume 穩定
-2. 確認 schema migration source of truth
-3. 檢查各 domain table ownership
-4. 減少跨 module repository / SQL coupling
-5. 容器化 Backend / Frontend
-6. 使用 Compose 做完整整合
-7. 再設計 Kubernetes
-8. 最後依實際需求拆 service 與 database
+1. 穩定 MySQL Compose、volume 與 migration
+2. 確認 Domain table ownership
+3. 減少跨 module Repository / SQL coupling
+4. 容器化 Backend / Frontend
+5. 用 Compose 驗證完整整合
+6. 評估 Kubernetes 是否解決真實問題
+7. 最後依明確需求拆 service
 ```
 
-## 6. Open Questions
+## 6. 延期／未定
 
-- Kubernetes 上 Database 是否實際自建。
+目前尚未完成或尚未決定：
+
+- Backend／Frontend images。
+- Kubernetes manifests。
 - 正式 service boundary。
-- Production DB topology。
+- Production topology。
+- Kubernetes 上 Database 採 self-hosted 或 managed service。

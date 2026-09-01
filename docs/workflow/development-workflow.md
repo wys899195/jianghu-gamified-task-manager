@@ -1,5 +1,7 @@
 # 需求分析與開發工作流
 
+本文件擁有需求分析、Backlog、Issue、Branch、PR 與 Commit 流程。產品文件只決定 scope guardrail，不重複維護這些操作方式。
+
 ## 1. Design Flow
 
 UI 不應早於核心需求與流程定義。
@@ -76,6 +78,8 @@ Acceptance Criteria 描述 observable behavior，不指定不必要的內部實�
 
 若某個設計仍未確認，不應直接當成實作規格。
 
+若產品設計持續延後可用版本，依 [`product-principles.md`](../product/product-principles.md) 回到已確認的核心範圍；本文件只負責如何記錄與排程工作。
+
 ## 6. GitHub Issue
 
 個人專案使用 Issue，但保持輕量。
@@ -125,6 +129,23 @@ PR 不是 Commit 的前置步驟。
 
 ## 8. Commit
 
-Commit 格式與允許 type 以 `AGENTS.md` 為準。
+格式：
+
+```text
+type(scope): description
+```
+
+允許 type：
+
+- `feat`
+- `fix`
+- `docs`
+- `style`
+- `refactor`
+- `test`
+- `chore`
+- `pref`（目前專案自訂值；除非另行確認，不自行改為 `perf`）
 
 Commit description 應描述實際變更，不混入無關修改。
+
+需要 extended description 時，subject 後保留空行，再用簡短條列說明實際變更。產生 staged commit message 時只分析 staged diff，不把未 staged 修改混入描述。

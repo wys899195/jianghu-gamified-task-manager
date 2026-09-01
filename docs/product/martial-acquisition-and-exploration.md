@@ -1,5 +1,9 @@
 # 武學取得與探索設計
 
+本文件擁有機緣、尋訪、pity、取得來源、acquisition provenance 與探索玩法。Fragment count、傳承完整度、修煉進度與境界由 [`martial-progression.md`](martial-progression.md) 負責。
+
+除「提案」「未定」與「延期」內容外，其餘規則為已確認。
+
 ## 1. 取得語義
 
 武學取得層使用「江湖機緣／尋訪」語義，而不是明顯的抽卡／開包語義。
@@ -11,7 +15,7 @@
 
 ## 2. 一般隨機取得
 
-目前方向採兩層抽取：
+兩層抽取是目前提案：
 
 ```text
 先決定稀有度
@@ -47,7 +51,7 @@
 
 > **運氣可以讓使用者提早取得內容，但不應決定核心收藏是否永遠無法完成。**
 
-目前偏好的方向：
+偏好提案：
 
 - 線索越多，提前取得機率逐步提高。
 - 線索完整後直接取得／找到下落。
@@ -95,30 +99,27 @@
 
 「傳承完整後移出正常殘章池」只代表該取得池去重，不代表相關 NPC、事件或世界內容失效。
 
+當 Progression 回報某武學傳承完整時，Acquisition 負責：
+
+- 從正常殘章取得池移除該武學。
+- 清除該武學的 active pursuit／尋訪進度。
+- 保留已發生的 acquisition provenance。
+
 最小概念應能區分 martial progress 與 acquisition / provenance；是否在 V1 使用獨立資料表仍待 Schema 設計。
 
-## 7. Event 模型方向
+## 7. Event 能力需求（提案）
 
-未來若大量增加江湖內容，應以少量共用 Event / Requirement / Reward 模型支撐，不讓每種敘事各自形成一套 Service。
+若未來大量增加江湖內容，產品需要少量可組合的 Event／Requirement／Choice／Reward 能力，不應讓每種敘事形成完全不同的操作規則。
 
-可用的架構語義包括：
+產品語義至少需要表達：
 
-- `eventType`
-- `eventText`
-- `requirements`
-- `choices`
-- `rewards`
+- 事件內容與類型。
+- 觸發／參與條件。
+- 可選行動。
+- 結果與 Reward。
+- 隨機入口與固定結果必須能分開表達。
 
-武學取得底層曾收斂成四類架構語義：
-
-- `RANDOM_DISCOVERY`
-- `CONDITIONAL_REWARD`
-- `PROGRESS_UNLOCK`
-- `PURCHASE`
-
-這些名稱不是已定案 enum / Schema。
-
-事件「入口是否隨機」與「發生後結果是否固定」必須分開建模。
+具體 enum、Schema、Service 或共用 event engine 尚未定；只有在 Schema 工作取得確認後，才由 architecture 文件定義，不能從本節直接產生程式識別字。
 
 ## 8. 江湖地點與探索
 
@@ -164,11 +165,11 @@ V1 可以保留拜師／師承 fantasy，但不建立完整門派 membership 狀
 
 主要收藏目標中的武學應存在不會永久錯過的取得路徑。
 
-## 10. Deferred / Open Questions
+## 10. 延期／未定問題
 
 - 機緣觸發規則。
 - 武學總數與稀有度分布。
 - 尋訪 soft pity / hard pity 的精確公式。
 - 區域是否進入 V1。
-- Event / Requirement / Reward 最終 Schema。
+- Event／Requirement／Reward 是否需要共用技術模型及其最終 Schema。
 - acquisition provenance 是否在 V1 落成獨立資料表。

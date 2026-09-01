@@ -1,6 +1,8 @@
 # Backend Unit Testing
 
-本文件規範 Backend 的單元測試。以目前可正常執行的 Jest + TypeScript ESM 實作為準：`Backend/test/unit/`、`@jest/globals`、`jest.unstable_mockModule`、dynamic import 與相鄰的 `*MockData.ts` fixture。不得在單一測試工作中自行更換框架、mock 寫法、命名或目錄結構。
+本文件只規範 Backend Unit Test 的 Jest ESM、Mock、hook、fixture、命名與目錄。測試分層、案例風險選擇與 Coverage 由 [`testing-strategy.md`](testing-strategy.md) 負責。
+
+目前可執行實作使用 `Backend/test/unit/`、`@jest/globals`、`jest.unstable_mockModule`、dynamic import 與相鄰的 `*MockData.ts` fixture。不得在單一測試工作中自行更換框架、mock 寫法、命名或目錄結構。
 
 ## 執行與驗證
 
@@ -11,14 +13,16 @@
 
 ## 案例設計
 
-- 優先測試明確業務規則、身份驗證、授權、Session、狀態轉換、資料隔離與安全相關行為；目前優先是 Service 與 Middleware。
-- 每個案例只驗證一個情境與可觀察結果，涵蓋正常結果、已定義錯誤與關鍵邊界，不追求任意層級的全面覆蓋率。
+- 依總策略選擇高風險案例；Backend 目前優先是 Service 與 Middleware 的業務規則、身份驗證、授權、Session、狀態轉換、資料隔離與安全行為。
+- 每個案例只驗證一個情境與可觀察結果。
 - 寫案例前先確認：目標函式的責任、輸入情境、需控制的外部依賴、預期回傳／錯誤／流程中止結果。
 - 未確認需求、未知資料庫錯誤或推測錯誤碼，不可先寫成測試規格。只有函式明確負責轉換、重試或補償的錯誤才寫 unit test。
 
 ## Arrange / Act / Assert
 
 每個測試維持 Arrange / Act / Assert 順序與空行分隔：
+
+`// Arrange`、`// Act` 與 `// Assert` 是 Backend 單元測試的結構標記，用來標示測試階段；它們不是逐行翻譯程式碼，因此可依本文件使用。
 
 ```ts
 /*
@@ -93,6 +97,13 @@ const {
 - mock 結構必須符合正式 import；例如 `import bcrypt from 'bcrypt'` 對應 `{ default: { hash: bcryptHashMock } }`。
 - 不把實際 bcrypt hash 寫死為 fixture；bcrypt 使用隨機 salt，unit test 應以固定 fake hash 驗證 Service 傳遞行為。
 
+## Setup 與 Cleanup
+
+- `beforeAll`：只建立整組共用且昂貴的資源。
+- `beforeEach`：reset mock、建立 clean baseline、共用 service instance 或最低必要 fixture；不得隱藏特定 business scenario。
+- `afterEach`：清除 testcase state。共用 mock 依目前模式使用 `jest.resetAllMocks()`。
+- `afterAll`：關閉 DB pool、server 或其他 shared resource；一般 Unit Test 不應因此連接真實 MySQL。
+
 ## 名稱、註解、fixture 與目錄
 
 - 測試檔命名為 `<目標模組>.test.ts`；可重用 fixture 命名為 `<目標模組>MockData.ts`，放在對應測試檔旁。
@@ -108,6 +119,7 @@ test('describes observable behavior', async () => {
 ```
 
 - 對測試中的 `const`、`jest.unstable_mockModule` 與不直觀 mock 設定，使用簡短單行註解說明用途。
+- 上述測試專屬註解格式、必要性與使用時機由本文件定義；TypeScript 原始碼的通用註解規則見 [TypeScript 註解規範](../conventions/comments/typescript.md)。
 - 遵循 strict 型別且不使用 `any`。fixture 的 optional 欄位若會在 Assert 視為必填，使用 `satisfies` 保留精確型別。
 - 只在同一測試檔重複使用的 request、預期值或假資料才抽到 `*MockData.ts`；fixture 放資料、不放測試流程。
 - 保持案例獨立，不依賴執行順序；每個案例自行設定所需 mock。
@@ -118,6 +130,5 @@ test('describes observable behavior', async () => {
 - Service：測業務結果、已定義錯誤、權限與狀態規則，mock Repository 與外部服務。
 - Middleware：以最小 `req`、`res`、`next` 測缺少／無效／有效輸入、錯誤分類與 `res.locals`。
 - 薄型 Controller 與 Route：優先由 API 測試驗證 Request、Response、Cookie、validation middleware 與 error handler，不建立大量 mock-heavy unit test。
-- Repository 與 MySQL：不在 unit test 直接驗證 SQL。以啟動後端並連接專用測試資料庫的 Postman/API 測試驗證 migration、SQL、constraint 與完整 HTTP 流程。
 
-本專案目前維持「Unit Test + API System Test」兩層主要自動化測試。API System Test 細則見 `api-testing.md`；測試須使用可重建的專用測試資料庫、先執行 migration，且不得連接 development / production database。日後若 transaction、併發或 SQL 除錯成本提高，再評估獨立 Repository / DB Integration Test。
+整體 Unit／API／DB 分工只由 [`testing-strategy.md`](testing-strategy.md) 定義；API System Test 的 Postman 實作細則見 [`api-testing.md`](api-testing.md)。

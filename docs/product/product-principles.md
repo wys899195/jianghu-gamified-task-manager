@@ -1,5 +1,9 @@
 # 產品定位與設計原則
 
+本文件擁有產品定位、最高層產品原則與 V1 Scope Guardrails。Domain 細節由各產品文件負責；Backlog、Sprint 與 Issue 的處理方式由 [`../workflow/development-workflow.md`](../workflow/development-workflow.md) 負責。
+
+除明確標為「提案」或「延期」的內容外，本文件原則皆為已確認。
+
 ## 1. 產品定位
 
 Jianghu 是一款融合武俠／江湖元素的遊戲化自我管理 Web App。
@@ -18,11 +22,11 @@ Jianghu 是一款融合武俠／江湖元素的遊戲化自我管理 Web App。
 
 而不是 RPG、Web Game 或完整角色扮演遊戲。
 
-## 2. 成功指標
+## 2. 成功指標（提案）
 
 不以 App 停留時間作為核心成功指標。
 
-更有意義的觀察方向包括：
+比停留時間更有意義的候選觀察方向包括：
 
 - 每週有效技能鍛鍊時間。
 - 任務開始率與完成率。
@@ -55,7 +59,7 @@ Jianghu 是一款融合武俠／江湖元素的遊戲化自我管理 Web App。
 
 > 打開 App 後，是否真的更容易開始或推進現實工作。
 
-目前方向偏向：
+已確認依賴方向：
 
 ```text
 現實任務
@@ -128,7 +132,7 @@ Planning
 
 完成現實任務後的遊戲操作應短而有感，避免使用者花大量時間逛市集、整理庫存或操作複雜經濟。
 
-## 5. V1 Scope Guardrails
+## 5. V1 Scope Guardrails（已確認）
 
 V1 優先成為可每天使用的「武俠風任務與修行紀錄 App」。
 
@@ -141,7 +145,7 @@ V1 優先成為可每天使用的「武俠風任務與修行紀錄 App」。
 - 進度與 Activity History。
 - 簡單武學養成與收藏。
 
-V1 不應優先建立：
+下列項目延期，不屬於 V1 優先範圍：
 
 - 一般物品／裝備／消耗品／強化／合成。
 - 通用 Item / Inventory Domain。
@@ -150,15 +154,15 @@ V1 不應優先建立：
 - 自宅。
 - 完整門派 membership／退派／轉派／忠誠度。
 - 社交與重度敘事。
-- AI 師傅或以 AI 驅動核心 Reward。
+- AI 師傅。
 - 自創武學；此項屬長期 endgame。
 
 新增資源、素材或貨幣前，必須先確認它是否真的產生新的決策價值，而不是只增加 source / sink 與平衡成本。
 
 ## 6. 開發 Scope Guardrail
 
-開發期間出現的新點子先記錄到 Backlog，不立即中斷目前 Sprint／當日目標。
-
-核心原則：
+產品層只定義以下判斷原則：
 
 > 如果產品設計開始持續延後可用版本，應停止擴張並回到目前可落地的核心功能。
+
+新點子如何進入 Backlog、Issue 或 Sprint，只由 [`development-workflow.md`](../workflow/development-workflow.md) 定義，本文件不維護第二套流程。

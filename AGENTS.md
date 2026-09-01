@@ -1,91 +1,46 @@
 # AGENTS.md
 
-## Project Overview
-
-本專案為前後端分離的全端 Web 應用。
-- Frontend：React + TypeScript + Vite
-- Backend：Node.js + TypeScript + Express
-- Database：MySQL
-- 套件管理器：npm
-
-
-## Project Structure
-
-```text
-repo/
-├── Backend/              # 後端根目錄
-│   ├── src/
-│   │   ├── config/       # 環境、伺服器、資料庫與驗證設定
-│   │   ├── infrastructure/ # 後端基礎設施，包含 Database、Security
-│   │   ├── modules/      # 包含後端各功能模組
-│   │   │   └── module_name/       # 單一功能模組目錄
-│   │   │       ├── routes/        # 定義模組的 API 路由與 HTTP endpoint
-│   │   │       ├── middleware/    # 處理模組相關的 Request 驗證與前置處理
-│   │   │       ├── controllers/   # 處理 HTTP Request/Response 並呼叫 Service
-│   │   │       ├── services/      # 實作模組的業務邏輯與應用流程
-│   │   │       └── repositories/  # 負責模組的資料庫存取
-│   │   ├── shared/       # 包含跨模組共用代碼
-│   │   └── server.ts     # 後端入口點
-│   ├── test/             # 後端測試入口
-│   │   └──  unit/        # 單元測試
-│   └── package.json      
-├── Frontend/             # 前端根目錄
-│   ├── public/          
-│   └── src/              
-├── Database/
-│   └── migrations/       # SQL migrations，用於管理資料庫 Schema 變更，命名是有序的，如001_xxx.sql
-├── API-Tests             # API 測試 (Postman CLI)
-├── docs/                 # 現行專案設計與規範
-│   ├── product/          # 產品定位與 Domain / Feature 設計
-│   ├── architecture/     # 系統與技術架構
-│   ├── testing/          # 測試策略與各測試類型規範
-│   └── workflow/         # 需求與開發流程
-└── sh/                   # 專案部署、開發、測試腳本
-    ├── common/           # 跨環境共用 shell helper
-    ├── init/             # 專案第一次 clone 後的初始化腳本
-    ├── dev/              # 開發環境腳本
-    ├── test/             # 測試環境腳本
-    └── prod/             # 正式環境腳本
-```
-
-Backend 採垂直拆分模組、模組內水平分層：Request → Route → Middleware → Controller → Service → Repository → Database。
+本文件只規範 Agent 如何讀取、搜尋、修改與驗證本 repository。產品、架構、API、測試、工作流與程式碼規範由 `docs/` 擁有，本文件不建立平行規格。
 
 ## Documentation
 
-- 現行專案設計與規範位於 `docs/`；執行任務前先讀 `docs/README.md`，再依任務範圍閱讀相關文件。
-- 子目錄有 `README.md` 時先讀該 README；文件與實作／設定衝突時先指出差異，不自行推測。
+- 任務涉及設計決策、行為規則、架構、API、測試或開發規範時，先讀 `docs/README.md`，再依其中的 category 入口讀取相關文件。
+- 純檔案搜尋、程式碼定位或目錄查看，不需要載入無關 docs。
+- 若 docs 與程式碼／設定不一致，指出具體差異；未經確認不得自行判定哪一方為準，也不得只為消除差異而修改其中一方。
+- 使用者已確認規格變更時，實作與相關 docs 必須在同一工作中保持一致。
+- `docs/README.md` 定義文件狀態、責任與權威邊界；不得把本文件當成產品或架構 source of truth。
 
 ## File Search Strategy
 
-- 尋找檔案或功能實作時，必須優先依照本文件的 Project Structure 判斷可能位置。
-- Backend 相關功能優先從 `Backend/src/modules/<module_name>/` 開始查找，並依照 `routes -> middleware -> controllers -> services -> repositories` 的資料流追蹤。
-- Frontend 相關功能優先從 `Frontend/src/` 開始查找。
-- Database schema 或 migration 相關內容優先從 `Database/migrations/` 查找。
-- 只有在上述路徑無法定位時，才使用全專案搜尋。
-- 搜尋時優先使用 `rg` 或 `rg --files`，並盡量限制搜尋範圍以減少不必要的掃描。
+- 先依 `docs/conventions/project-structure.md` 判斷可能位置。
+- Backend 功能先從 `Backend/src/modules/<module_name>/` 開始，依 routes → middleware → controllers → services → repositories 的資料流追蹤。
+- Frontend 功能先從 `Frontend/src/` 開始。
+- Schema／migration 先從 `Database/migrations/` 開始。
+- 只有上述路徑無法定位時才擴大全專案搜尋。
+- 優先使用 `rg`、`rg --files`，並限制搜尋範圍。
 
-## Coding Style
+## Change Rules
 
-- 新增檔案時，`.ts` 檔案預設使用 PascalCase 命名；主要用於 Type 定義的 `.ts` 檔案則額外加上 `T` 前綴；其他檔案類型使用 snake_case 命名。
-- Never 使用 `any` 型別。
-
-## Never 規則
-- Never 把未確認的需求或推測當成規格。
-- Never 修改已執行的 migration；Schema 變更應建立新的 migration。
-- Never 未經確認重構與當前任務無關的程式碼。
-- Never 忽略既有的型別、測試或資料一致性檢查。
-- Never 硬編碼敏感資訊
+- 檔案放置、命名與 TypeScript 規則遵循 `docs/conventions/`。
+- 不把未確認需求或推測當成規格。
+- Schema／migration 變更遵循 `docs/architecture/mysql-infrastructure.md`，本文件不重複其 lifecycle 規則。
+- 不重構與目前任務無關的程式碼。
+- 不忽略既有型別、測試或資料一致性檢查。
+- 不硬編碼敏感資訊。
+- 工作樹已有修改時，保留無關內容，不覆蓋或還原不屬於目前任務的變更。
 
 ## Testing
 
-- 測試工作先閱讀 `docs/testing/testing-strategy.md`。
-- Backend 單元測試另閱讀 `docs/testing/backend-unit-testing.md`；Frontend 單元測試另閱讀 `docs/testing/frontend-unit-testing.md`；API System Test 另閱讀 `docs/testing/api-testing.md`。
-- 沿用既有測試框架、Mock、命名、目錄與慣例；文件與實作衝突時先指出差異，非必要不得自行改變測試架構或建立新慣例。
-- 後端修改後，於 `Backend/` 執行 `npm run check`；前端依既定工具鏈執行。
+- 先讀 `docs/testing/README.md` 與 `docs/testing/testing-strategy.md`。
+- Backend Unit Test 另讀 `docs/testing/backend-unit-testing.md`。
+- Frontend Unit Test 另讀 `docs/testing/frontend-unit-testing.md`。
+- API System Test 另讀 `docs/testing/api-testing.md` 與 `API-Tests/README.md`。
+- 沿用既有 framework、Mock、命名、目錄與 fixture；文件與實作衝突時先指出差異。
+- Backend 修改後，在 `Backend/` 執行 `npm run check`。
+- Frontend 修改後，執行 `Frontend/package.json` 已定義的相關 check；不得臆測未建立的 test command。
+- 文件-only 修改至少檢查 Markdown links、`git diff --check` 與本任務涉及的重複／反向引用。
 
-## Commit 規範
+## Workflow
 
-格式：`type(scope): description`
-類型：`feat` / `fix` / `docs` / `style` / `refactor` / `test` / `chore` / `pref`
-
-description 應簡潔描述實際變更，不混入無關修改。
+- 需求、Backlog、Branch、PR 與 Commit 規範只由 `docs/workflow/development-workflow.md` 定義。
+- 產生 staged commit message 時只分析 staged diff。
