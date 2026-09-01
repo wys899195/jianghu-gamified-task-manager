@@ -7,7 +7,6 @@ import {
 } from '@jest/globals';
 
 import type {
-    NextFunction,
     Request,
     Response,
 } from 'express';
@@ -30,6 +29,9 @@ const mappedErrorCode = 'TEST_MAPPED_ERROR';
 
 // 已映射 ServiceError 預期回傳的 HTTP status。
 const mappedErrorStatus = 409;
+
+// 已映射 ServiceError 預期回傳給 Client 的訊息。
+const mappedErrorMessage = 'Mapped service error.';
 
 // 建立可驗證 status 與 json 呼叫的最小 Express Response。
 const createResponse = (): {
@@ -93,7 +95,7 @@ describe('ApiErrorHandler.createApiErrorHandler', () => {
             validationError,
             {} as Request,
             response,
-            jest.fn<NextFunction>(),
+            jest.fn<(error?: unknown) => void>(),
         );
 
         expect(statusMock).toHaveBeenCalledWith(400);
@@ -105,19 +107,21 @@ describe('ApiErrorHandler.createApiErrorHandler', () => {
 
     /*
         測試目標：確認已映射的 ServiceError 使用指定 HTTP status。
-        預期結果：回傳 map 中的 status 與 ServiceError message。
+        預期結果：回傳 map 中定義的 status 與 public message。
     */
     test('returns the mapped response for a ServiceError', () => {
 
-        // 建立已知 ServiceError code 的 HTTP status map。
+        // 建立已知 ServiceError code 的 API response map。
         const errorHandler = createApiErrorHandler({
-            [mappedErrorCode]: mappedErrorStatus,
+            [mappedErrorCode]: {
+                statusCode: mappedErrorStatus,
+                message: mappedErrorMessage,
+            },
         });
 
         // 建立已映射的預期錯誤。
         const serviceError = new ServiceError(
             mappedErrorCode,
-            'Mapped service error.',
         );
 
         // 建立可驗證的 Response mock。
@@ -131,14 +135,14 @@ describe('ApiErrorHandler.createApiErrorHandler', () => {
             serviceError,
             {} as Request,
             response,
-            jest.fn<NextFunction>(),
+            jest.fn<(error?: unknown) => void>(),
         );
 
         expect(statusMock).toHaveBeenCalledWith(
             mappedErrorStatus,
         );
         expect(jsonMock).toHaveBeenCalledWith({
-            message: serviceError.message,
+            message: mappedErrorMessage,
         });
     });
 
@@ -157,7 +161,6 @@ describe('ApiErrorHandler.createApiErrorHandler', () => {
         // 建立未映射的 ServiceError。
         const serviceError = new ServiceError(
             'TEST_UNMAPPED_ERROR',
-            'Sensitive internal error.',
         );
 
         // 建立可驗證的 Response mock。
@@ -171,7 +174,7 @@ describe('ApiErrorHandler.createApiErrorHandler', () => {
             serviceError,
             {} as Request,
             response,
-            jest.fn<NextFunction>(),
+            jest.fn<(error?: unknown) => void>(),
         );
 
         expect(statusMock).toHaveBeenCalledWith(500);
@@ -206,7 +209,7 @@ describe('ApiErrorHandler.createApiErrorHandler', () => {
             unexpectedError,
             {} as Request,
             response,
-            jest.fn<NextFunction>(),
+            jest.fn<(error?: unknown) => void>(),
         );
 
         expect(statusMock).toHaveBeenCalledWith(500);

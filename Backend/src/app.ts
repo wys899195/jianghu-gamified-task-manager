@@ -12,15 +12,20 @@ import { backendMysqlPool } from './infrastructure/database/MysqlConnector.js';
 import authRoutes from './modules/user/routes/AuthRoutes.js';
 
 import {
+    userErrorResponseMap,
+} from './modules/user/apiErrors/UserErrors.js';
+
+import {
     createApiErrorHandler,
 } from './shared/middleware/ApiErrorHandler.js';
 
-import {
-    errorHttpStatusMap,
-} from './shared/errors/ErrorHttpStatusMap.js';
-
-
 const app = express();
+
+
+// 組裝各功能模組的 ServiceError 對外 API response。
+const errorResponseMap = {
+    ...userErrorResponseMap,
+};
 
 
 // ========================================
@@ -117,7 +122,7 @@ app.use(
 
 app.use(
     createApiErrorHandler(
-        errorHttpStatusMap,
+        errorResponseMap,
     ),
 );
 

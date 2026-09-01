@@ -20,7 +20,7 @@ import {
 
 import {
     UserErrorCode,
-} from '../apiErrors/UserErrorCode.js';
+} from '../apiErrors/UserErrors.js';
 
 
 /**
@@ -66,7 +66,6 @@ export async function authenticateRequest(
 
             throw new ServiceError(
                 UserErrorCode.USER_INVALID_ACCESS_TOKEN,
-                'Invalid access token.',
             );
 
         }
@@ -87,7 +86,6 @@ export async function authenticateRequest(
 
             throw new ServiceError(
                 UserErrorCode.USER_INVALID_ACCESS_TOKEN,
-                'Invalid access token.',
             );
 
         }
@@ -115,7 +113,6 @@ export async function authenticateRequest(
 
                 throw new ServiceError(
                     UserErrorCode.USER_INVALID_ACCESS_TOKEN,
-                    'Invalid access token.',
                 );
 
             }

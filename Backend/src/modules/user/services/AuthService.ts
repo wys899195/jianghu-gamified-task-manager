@@ -42,7 +42,7 @@ import {
 
 import {
     UserErrorCode,
-} from '../apiErrors/UserErrorCode.js';
+} from '../apiErrors/UserErrors.js';
 
 import type {
     LoginRequest,
@@ -83,7 +83,6 @@ export async function register(
 
         throw new ServiceError(
             UserErrorCode.USER_EMAIL_ALREADY_EXISTS,
-            'Email already exists.',
         );
 
     }
@@ -155,7 +154,6 @@ export async function login(
 
         throw new ServiceError(
             UserErrorCode.USER_INVALID_CREDENTIALS,
-            'Invalid email or password.',
         );
 
     }
@@ -173,7 +171,6 @@ export async function login(
 
         throw new ServiceError(
             UserErrorCode.USER_INVALID_CREDENTIALS,
-            'Invalid email or password.',
         );
 
     }
@@ -279,7 +276,6 @@ export async function refreshAccessToken(
 
         throw new ServiceError(
             UserErrorCode.USER_INVALID_REFRESH_TOKEN,
-            'Invalid refresh token.',
         );
 
     }

@@ -7,14 +7,13 @@ import {
 } from '@jest/globals';
 
 import type {
-    NextFunction,
     Request,
     Response,
 } from 'express';
 
 import {
     UserErrorCode,
-} from '../../../../../src/modules/user/apiErrors/UserErrorCode.js';
+} from '../../../../../src/modules/user/apiErrors/UserErrors.js';
 
 import {
     validAccessToken,
@@ -51,7 +50,9 @@ const createResponse = (): Response => ({
 } as Response);
 
 // 記錄 middleware 傳遞的成功流程或錯誤。
-const nextMock = jest.fn<NextFunction>();
+// 使用單一可選錯誤參數，避免 Express NextFunction 的多載與 Jest Mock 型別衝突。
+const nextMock =
+    jest.fn<(error?: unknown) => void>();
 
 
 // 將 JwtTokenService module 替換成受控的驗證結果與錯誤類別。

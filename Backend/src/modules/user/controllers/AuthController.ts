@@ -22,7 +22,7 @@ import {
 
 import {
     UserErrorCode,
-} from '../apiErrors/UserErrorCode.js';
+} from '../apiErrors/UserErrors.js';
 
 import {
     authConfig,
@@ -200,7 +200,6 @@ export async function refreshTokenController(
 
             throw new ServiceError(
                 UserErrorCode.USER_INVALID_REFRESH_TOKEN,
-                'Invalid refresh token.',
             );
 
         }

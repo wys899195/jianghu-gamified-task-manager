@@ -16,7 +16,7 @@ import {
 
 import {
     UserErrorCode,
-} from '../../../../../src/modules/user/apiErrors/UserErrorCode.js';
+} from '../../../../../src/modules/user/apiErrors/UserErrors.js';
 
 import {
     activeAuthSession,
@@ -187,7 +187,6 @@ describe('AuthService.register', () => {
         ).rejects.toEqual(
             new ServiceError(
                 UserErrorCode.USER_EMAIL_ALREADY_EXISTS,
-                'Email already exists.',
             ),
         );
 
@@ -282,7 +281,6 @@ describe('AuthService.register', () => {
         ).rejects.toEqual(
             new ServiceError(
                 UserErrorCode.USER_INVALID_CREDENTIALS,
-                'Invalid email or password.',
             ),
         );
 
@@ -307,7 +305,6 @@ describe('AuthService.register', () => {
         ).rejects.toEqual(
             new ServiceError(
                 UserErrorCode.USER_INVALID_CREDENTIALS,
-                'Invalid email or password.',
             ),
         );
 
@@ -371,7 +368,6 @@ describe('AuthService.register', () => {
         ).rejects.toEqual(
             new ServiceError(
                 UserErrorCode.USER_INVALID_REFRESH_TOKEN,
-                'Invalid refresh token.',
             ),
         );
 

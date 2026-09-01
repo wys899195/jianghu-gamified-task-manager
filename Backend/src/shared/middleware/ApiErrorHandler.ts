@@ -13,12 +13,18 @@ import {
   ZodError,
 } from 'zod';
 
-type ErrorHttpStatusMap =
-  Record<string, number>;
+type ErrorResponseMap =
+  Record<
+    string,
+    {
+      statusCode: number;
+      message: string;
+    }
+  >;
 
 
 export function createApiErrorHandler(
-  errorHttpStatusMap: ErrorHttpStatusMap,
+  errorResponseMap: ErrorResponseMap,
 ) {
 
   return function apiErrorHandler(
@@ -42,13 +48,13 @@ export function createApiErrorHandler(
     // 預期錯誤 ServiceError
     if (error instanceof ServiceError) {
 
-      const statusCode =
-        errorHttpStatusMap[error.code];
+      const errorResponse =
+        errorResponseMap[error.code];
 
-      if (statusCode !== undefined) {
+      if (errorResponse !== undefined) {
 
-        res.status(statusCode).json({
-          message: error.message,
+        res.status(errorResponse.statusCode).json({
+          message: errorResponse.message,
         });
 
         return;
