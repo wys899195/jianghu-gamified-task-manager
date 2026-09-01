@@ -1,0 +1,13 @@
+{
+  "id": "jianghu-local-api-test-environment",
+  "name": "jianghu-local-api-test-environment",
+  "values": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:3000",
+      "type": "default",
+      "enabled": true
+    }
+  ],
+  "_postman_variable_scope": "environment"
+}

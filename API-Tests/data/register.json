@@ -1,0 +1,67 @@
+[
+  {
+    "name": "註冊成功 - 不設定暱稱",
+    "body": {
+      "email": "uniqueEmail",
+      "password": "Test12345"
+    },
+    "expectedStatus": 201
+  },
+  {
+    "name": "註冊成功 - 設定暱稱",
+    "body": {
+      "email": "uniqueEmail",
+      "password": "Test12345",
+      "nickname": "API 測試使用者"
+    },
+    "expectedStatus": 201
+  },
+  {
+    "name": "註冊成功 - 暱稱剛好 30 個字元",
+    "body": {
+      "email": "uniqueEmail",
+      "password": "Test12345",
+      "nickname": "123456789012345678901234567890"
+    },
+    "expectedStatus": 201
+  },
+  {
+    "name": "註冊失敗 - 暱稱超過 30 個字元",
+    "body": {
+      "email": "uniqueEmail",
+      "password": "Test12345",
+      "nickname": "1234567890123456789012345678901"
+    },
+    "expectedStatus": 400
+  },
+  {
+    "name": "註冊失敗 - Email 格式錯誤",
+    "body": {
+      "email": "heyhey.gmail.com",
+      "password": "Test12345"
+    },
+    "expectedStatus": 400
+  },
+  {
+    "name": "註冊失敗 - 缺少 Email",
+    "body": {
+      "password": "Test12345"
+    },
+    "expectedStatus": 400
+  },
+  {
+    "name": "註冊失敗 - 缺少 Password",
+    "body": {
+      "email": "uniqueEmail"
+    },
+    "expectedStatus": 400
+  },
+  {
+    "name": "註冊失敗 - Password 過短",
+    "body": {
+      "email": "uniqueEmail",
+      "password": "123"
+    },
+    "expectedStatus": 400
+  }
+]

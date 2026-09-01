@@ -1,0 +1,86 @@
+{
+  "info": {
+    "name": "Jianghu Auth API Tests",
+    "description": "Data-driven authentication API tests for the Jianghu backend.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Register",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{{requestBody}}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/register",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "auth",
+            "register"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.iterationData.get('body');",
+              "const requestBody = JSON.parse(JSON.stringify(body));",
+              "",
+              "if (requestBody.email === 'uniqueEmail') {",
+              "    requestBody.email = `api-test-${Date.now()}@example.com`;",
+              "}",
+              "",
+              "pm.variables.set('requestBody', JSON.stringify(requestBody));"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const testName = pm.iterationData.get('name');",
+              "const expectedStatus = Number(pm.iterationData.get('expectedStatus'));",
+              "",
+              "pm.test(`${testName} - 狀態碼正確`, function () {",
+              "    pm.response.to.have.status(expectedStatus);",
+              "});",
+              "",
+              "pm.test(`${testName} - 回應格式為 JSON`, function () {",
+              "    pm.response.to.be.json;",
+              "});",
+              "",
+              "if (expectedStatus === 201) {",
+              "    const response = pm.response.json();",
+              "",
+              "    pm.test(`${testName} - 回應包含有效的 accountId`, function () {",
+              "        pm.expect(response.accountId).to.be.a('number');",
+              "        pm.expect(response.accountId).to.be.above(0);",
+              "    });",
+              "} else {",
+              "    const response = pm.response.json();",
+              "",
+              "    pm.test(`${testName} - 回應包含錯誤訊息`, function () {",
+              "        pm.expect(response.message).to.be.a('string').and.not.empty;",
+              "    });",
+              "}"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

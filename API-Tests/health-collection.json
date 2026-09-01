@@ -1,0 +1,90 @@
+{
+  "info": {
+    "name": "Jianghu Backend Health API Tests",
+    "description": "Health checks for the Jianghu backend API.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Backend Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "health"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('狀態碼為 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('回應格式為 JSON', function () {",
+              "    pm.response.to.be.json;",
+              "});",
+              "",
+              "const response = pm.response.json();",
+              "",
+              "pm.test('回應狀態為 OK', function () {",
+              "    pm.expect(response.status).to.eql('ok');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Database Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/health/database",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "health",
+            "database"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('狀態碼為 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('回應格式為 JSON', function () {",
+              "    pm.response.to.be.json;",
+              "});",
+              "",
+              "const response = pm.response.json();",
+              "",
+              "pm.test('回應狀態為 ok', function () {",
+              "    pm.expect(response.status).to.eql('ok');",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

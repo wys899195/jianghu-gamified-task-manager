@@ -73,4 +73,4 @@ API System Test 不重複所有 Schema boundary permutation。像 Auth route、C
 
 ## 8. Asset Layout Evolution
 
-目前資產仍是平面 collection／environment 加上 `data/`；實際狀態見 `API-Tests/README.md`。只有在 collection 數量或操作成本明顯增加時，再評估 `collections/`、`environments/` 與統一 runner；結構變更必須和資產及操作文件同時完成。
+目前資產是平面 collection／environment 加上 `data/`，並由 `sh/test/run_api_test.sh` 作為統一 runner；實際檔名、執行順序與操作準備見 `API-Tests/README.md`。只有在 collection 數量或操作成本明顯增加時，再評估重整為 `collections/`、`environments/` 等目錄；結構變更必須和資產、runner 及操作文件同時完成。
