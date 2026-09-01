@@ -12,12 +12,15 @@ export function validateRequestBody(
     schema: ZodType,
 ): RequestHandler {
     return (req, _res, next): void => {
-        try {
-            // 使用 schema 的輸出結果，確保 Controller 不會再讀取未驗證的原始資料。
-            req.body = schema.parse(req.body);
-            next();
-        } catch (error) {
-            next(error);
+        const result = schema.safeParse(req.body);
+
+        if (!result.success) {
+            next(result.error);
+            return;
         }
+
+        // 使用 schema 的輸出結果，確保 Controller 不會再讀取未驗證的原始資料。
+        req.body = result.data;
+        next();
     };
 }

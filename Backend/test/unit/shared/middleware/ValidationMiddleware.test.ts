@@ -7,7 +7,6 @@ import {
 } from '@jest/globals';
 
 import type {
-    NextFunction,
     Request,
     Response,
 } from 'express';
@@ -35,7 +34,9 @@ const createRequest = (
 } as Request);
 
 // 記錄 middleware 傳遞的成功流程或錯誤。
-const nextMock = jest.fn<NextFunction>();
+// 使用單一可選錯誤參數，避免 Express NextFunction 的多載與 Jest Mock 型別衝突。
+const nextMock =
+    jest.fn<(error?: unknown) => void>();
 
 
 // 目標函式：ValidationMiddleware.validateRequestBody
@@ -46,7 +47,7 @@ describe('ValidationMiddleware.validateRequestBody', () => {
     });
 
     /*
-        測試目標：確認驗證成功時使用 schema parse 後的資料。
+        測試目標：確認 safeParse 成功時使用解析後的資料。
         預期結果：req.body 被覆寫為轉換結果，並以無錯誤的 next 繼續流程。
     */
     test('replaces the request body with parsed data', () => {
@@ -72,7 +73,7 @@ describe('ValidationMiddleware.validateRequestBody', () => {
     });
 
     /*
-        測試目標：確認驗證失敗時不進入後續 middleware。
+        測試目標：確認 safeParse 失敗時不進入後續 middleware。
         預期結果：next 收到 ZodError，且 req.body 保持原始資料。
     */
     test('forwards validation errors to next', () => {

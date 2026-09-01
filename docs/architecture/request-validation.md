@@ -21,15 +21,18 @@ Request Validation 使用 Zod：
 ```text
 Request
 → schema.safeParse(req.body)
-→ success: req.body = result.data
-→ next()
-→ failure: next(error)
-→ ApiErrorHandler
+├─ result.success = true
+│  → req.body = result.data
+│  → next()
+└─ result.success = false
+   → next(result.error)
+   → ApiErrorHandler
+   → 400 Request Validation Error
 ```
 
 成功後必須使用解析後的 `result.data` 覆寫 request body，因為 `.trim()` 等 Zod transform 不會修改原始 input。
 
-Validation 失敗交由共用 Error Handler 統一回應，不由 Middleware 直接送 Response。錯誤處理責任見 [`api-error-handling.md`](api-error-handling.md)。
+Validation 失敗時，Middleware 將 `result.error` 傳給共用 Error Handler；Error Handler 對 `ZodError` 明確回應 400，不由 Middleware 直接送 Response。錯誤處理責任見 [`api-error-handling.md`](api-error-handling.md)。
 
 ## 3. Schema Ownership
 
