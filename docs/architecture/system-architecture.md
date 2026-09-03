@@ -97,4 +97,4 @@ Provider、資料保留與實際功能仍屬未定，確認前不得從本節推
 
 已確認方向是先建立可搜尋、可分析並適當去識別的結構化 Log。依事件可包含 timestamp、level、module、request／trace identifier、user identifier、event type、duration 與 error code。
 
-System、Request、Business、AI、Audit Log 是可依需求區分的類型，不代表目前全部存在。Elasticsearch 只屬後期集中式搜尋提案，不取代 MySQL 業務資料庫。
+System、Request、Business、AI、Audit Log 是可依需求區分的類型，不代表目前全部存在。Authentication 的安全事件、敏感資料禁止記錄與版本化告警範圍見 [`authentication.md`](authentication.md#6-auth-安全事件記錄與告警延期至-v2)。Elasticsearch 只屬後期集中式搜尋提案，不取代 MySQL 業務資料庫。

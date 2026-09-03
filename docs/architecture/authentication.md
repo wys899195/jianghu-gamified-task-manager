@@ -15,8 +15,9 @@
 
 延期至後續版本：
 
-- V2：Refresh Token Rotation、Token Family、Reuse Detection 與 Session security 強化。
-- V3：多裝置 Session UI、指定 revoke、登出所有裝置與完整 Session 管理。
+- V2：Refresh Token Rotation、Token Family、Reuse Detection，以及 Auth 安全事件記錄與高訊號告警基礎。
+- V3：多裝置 Session UI、指定 revoke、登出所有裝置、完整 Session 管理，以及依保留期限清理已撤銷／已過期的 Session。
+- V4：Login 與 Refresh 的 rate limiting、失敗節流與濫用防護。
 
 ## 2. 核心安全模型
 
@@ -118,7 +119,24 @@ AND expires_at > NOW()
 
 精確 table、column、index 與 foreign key 由 `Database/migrations/` 表達，不在本文件維護第二份 Schema。
 
-## 6. Frontend Concurrent Refresh（提案／待實作）
+## 6. Auth 安全事件記錄與告警（延期至 V2）
+
+V1 目前沒有 Auth 專用的結構化安全事件記錄、偵測或告警。V2 應先建立能支援調查與 Reuse Detection 的最小事件基礎，而不是直接假設集中式 Log 平台或完整 SIEM 已存在。
+
+至少記錄下列 Auth lifecycle 事件：
+
+- Login 成功與失敗。
+- Refresh 成功、無效與已撤銷 Token 使用。
+- Refresh Token Rotation 後偵測到舊 Token reuse。
+- Logout、單一 Session 撤銷與日後的全裝置撤銷。
+
+每個事件應以結構化欄位表達時間、等級、模組、event type、結果、穩定 error code、request／trace identifier，以及已確認登入身份時的 account identifier。不得記錄原始 Password、Access Token、Refresh Token、Cookie、Authorization Header 或任何可用來重放憑證的衍生值。
+
+告警只針對高訊號事件，避免把一般使用者錯誤變成雜訊。V2 最優先的是 Refresh Token reuse，因為它可能代表 Refresh Token 遭竊；重複 Login／Refresh 失敗的門檻、告警目的地與保留期限，需配合 V4 rate limiting 與實際部署／維運需求確認後實作。
+
+Auth 事件是系統結構化 Logging guardrails 的一種具體應用；共通欄位與去識別原則見 [`system-architecture.md`](system-architecture.md#6-logging-guardrails)。
+
+## 7. Frontend Concurrent Refresh（提案／待實作）
 
 Frontend 目前尚未實作 Auth API client 與 concurrent refresh。提案是在多個 API 同時因 Access Token 過期收到 401 時，使用 `refreshPromise`、mutex 或其他 single-flight 機制：
 
@@ -128,7 +146,7 @@ Frontend 目前尚未實作 Auth API client 與 concurrent refresh。提案是�
 
 此模式尚未取得實作完成狀態；V2 若加入 Rotation，會成為更重要的 concurrency boundary。
 
-## 7. Design Rationale
+## 8. Design Rationale
 
 已確認選擇：
 

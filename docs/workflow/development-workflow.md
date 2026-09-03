@@ -148,4 +148,6 @@ type(scope): description
 
 Commit description 應描述實際變更，不混入無關修改。
 
+- Commit 訊息使用繁體中文與臺灣慣用的軟體工程用語；沒有慣用的臺灣中文用語時保留英文，不使用中國用語。
+
 需要 extended description 時，subject 後保留空行，再用簡短條列說明實際變更。產生 staged commit message 時只分析 staged diff，不把未 staged 修改混入描述。

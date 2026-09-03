@@ -1,0 +1,463 @@
+{
+  "info": {
+    "name": "Jianghu Account API Tests",
+    "description": "Account lifecycle API system tests for the Jianghu backend.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "testEmail",
+      "value": ""
+    },
+    {
+      "key": "currentPassword",
+      "value": "Account12345"
+    },
+    {
+      "key": "wrongPassword",
+      "value": "Wrong12345"
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    },
+    {
+      "key": "refreshToken",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Setup - Register Account",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{testEmail}}\",\n  \"password\": \"{{currentPassword}}\",\n  \"nickname\": \"API 測試帳號\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/register",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "auth",
+            "register"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const uniqueSuffix = `${Date.now()}-${Math.floor(Math.random() * 1000000)}`;",
+              "pm.collectionVariables.set('testEmail', `account-delete-${uniqueSuffix}@example.com`);"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('前置帳號註冊成功', function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test('註冊回應包含有效的 accountId', function () {",
+              "    const response = pm.response.json();",
+              "    pm.expect(response.accountId).to.be.a('number').and.above(0);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Setup - Login Account",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{testEmail}}\",\n  \"password\": \"{{currentPassword}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('前置帳號登入成功', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const response = pm.response.json();",
+              "const setCookieHeader = pm.response.headers.get('Set-Cookie');",
+              "const refreshTokenMatch = setCookieHeader && setCookieHeader.match(/^refreshToken=([^;]+)/);",
+              "",
+              "pm.test('登入回應包含 Access Token', function () {",
+              "    pm.expect(response.accessToken).to.be.a('string').and.not.empty;",
+              "});",
+              "",
+              "pm.test('登入回應設定 Refresh Token Cookie', function () {",
+              "    pm.expect(refreshTokenMatch).not.to.equal(null);",
+              "});",
+              "",
+              "pm.collectionVariables.set('accessToken', response.accessToken);",
+              "if (refreshTokenMatch) {",
+              "    pm.collectionVariables.set('refreshToken', refreshTokenMatch[1]);",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Delete Account - Missing Access Token",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"password\": \"{{currentPassword}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/account",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "account"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('未攜帶 Access Token 回傳 401', function () {",
+              "    pm.response.to.have.status(401);",
+              "});",
+              "",
+              "pm.test('未授權回應包含錯誤訊息', function () {",
+              "    const response = pm.response.json();",
+              "    pm.expect(response.message).to.eql('Authentication required.');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Delete Account - Missing Password",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/account",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "account"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('缺少密碼回傳 400', function () {",
+              "    pm.response.to.have.status(400);",
+              "});",
+              "",
+              "pm.test('驗證失敗回應包含 errors', function () {",
+              "    const response = pm.response.json();",
+              "    pm.expect(response.message).to.eql('Request validation failed.');",
+              "    pm.expect(response.errors).to.be.an('array').and.not.empty;",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Delete Account - Wrong Password",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"password\": \"{{wrongPassword}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/account",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "account"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('目前密碼錯誤回傳 401', function () {",
+              "    pm.response.to.have.status(401);",
+              "});",
+              "",
+              "pm.test('密碼錯誤使用明確訊息', function () {",
+              "    const response = pm.response.json();",
+              "    pm.expect(response.message).to.eql('Invalid password.');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Delete Account - Success",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"password\": \"{{currentPassword}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/account",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "account"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('帳號刪除成功回傳 204', function () {",
+              "    pm.response.to.have.status(204);",
+              "});",
+              "",
+              "pm.test('204 回應不包含 body', function () {",
+              "    pm.expect(pm.response.text()).to.eql('');",
+              "});",
+              "",
+              "pm.test('成功後清除 Refresh Token Cookie', function () {",
+              "    const setCookieHeader = pm.response.headers.get('Set-Cookie');",
+              "    pm.expect(setCookieHeader).to.be.a('string');",
+              "    pm.expect(setCookieHeader).to.match(/^refreshToken=;/i);",
+              "    pm.expect(setCookieHeader).to.match(/Expires=Thu, 01 Jan 1970|Max-Age=0/i);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Delete Account - Account No Longer Exists",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{accessToken}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"password\": \"{{currentPassword}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/account",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "account"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('已刪除帳號再次刪除回傳 404', function () {",
+              "    pm.response.to.have.status(404);",
+              "});",
+              "",
+              "pm.test('帳號不存在使用明確訊息', function () {",
+              "    const response = pm.response.json();",
+              "    pm.expect(response.message).to.eql('Account not found.');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Delete Account - Refresh Session Cascaded",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Cookie",
+            "value": "refreshToken={{refreshToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/auth/refresh",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "auth",
+            "refresh"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('帳號刪除後舊 Refresh Token 回傳 401', function () {",
+              "    pm.response.to.have.status(401);",
+              "});",
+              "",
+              "pm.test('舊 Refresh Session 已無法使用', function () {",
+              "    const response = pm.response.json();",
+              "    pm.expect(response.message).to.eql('Authentication required.');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Delete Account - Login No Longer Works",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{testEmail}}\",\n  \"password\": \"{{currentPassword}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('帳號刪除後無法再次登入', function () {",
+              "    pm.response.to.have.status(401);",
+              "});",
+              "",
+              "pm.test('登入失敗不洩漏帳號狀態', function () {",
+              "    const response = pm.response.json();",
+              "    pm.expect(response.message).to.eql('Invalid email or password.');",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

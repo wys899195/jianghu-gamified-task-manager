@@ -1,0 +1,454 @@
+{
+  "info": {
+    "name": "Jianghu Auth Session API Tests",
+    "description": "Authentication lifecycle API system tests for the Jianghu backend.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "testEmail",
+      "value": ""
+    },
+    {
+      "key": "currentPassword",
+      "value": "AuthSession12345"
+    },
+    {
+      "key": "wrongPassword",
+      "value": "Wrong12345"
+    },
+    {
+      "key": "refreshToken",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Setup - Register Account",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{testEmail}}\",\n  \"password\": \"{{currentPassword}}\",\n  \"nickname\": \"Auth API 測試帳號\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/register",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "auth",
+            "register"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const uniqueSuffix = `${Date.now()}-${Math.floor(Math.random() * 1000000)}`;",
+              "pm.collectionVariables.set('testEmail', `auth-session-${uniqueSuffix}@example.com`);"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('前置帳號註冊成功', function () {",
+              "    pm.response.to.have.status(201);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Register - Duplicate Email",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{testEmail}}\",\n  \"password\": \"{{currentPassword}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/register",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "auth",
+            "register"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('重複 Email 回傳 409', function () {",
+              "    pm.response.to.have.status(409);",
+              "});",
+              "",
+              "pm.test('重複 Email 使用明確訊息', function () {",
+              "    const response = pm.response.json();",
+              "    pm.expect(response.message).to.eql('Email already exists.');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Refresh - Missing Cookie",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{baseUrl}}/auth/refresh",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "auth",
+            "refresh"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('缺少 Refresh Cookie 回傳 401', function () {",
+              "    pm.response.to.have.status(401);",
+              "});",
+              "",
+              "pm.test('缺少 Refresh Cookie 不洩漏 Session 狀態', function () {",
+              "    const response = pm.response.json();",
+              "    pm.expect(response.message).to.eql('Authentication required.');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Logout - Missing Cookie",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{baseUrl}}/auth/logout",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "auth",
+            "logout"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('缺少 Refresh Cookie 仍可登出', function () {",
+              "    pm.response.to.have.status(204);",
+              "});",
+              "",
+              "pm.test('缺少 Refresh Cookie 仍會清除 Cookie', function () {",
+              "    const setCookieHeader = pm.response.headers.get('Set-Cookie');",
+              "    pm.expect(setCookieHeader).to.match(/^refreshToken=;/i);",
+              "    pm.expect(setCookieHeader).to.match(/Expires=Thu, 01 Jan 1970|Max-Age=0/i);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Login - Success",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{testEmail}}\",\n  \"password\": \"{{currentPassword}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('正確帳密登入成功', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const response = pm.response.json();",
+              "const setCookieHeader = pm.response.headers.get('Set-Cookie');",
+              "const refreshTokenMatch = setCookieHeader && setCookieHeader.match(/^refreshToken=([^;]+)/);",
+              "",
+              "pm.test('登入回應包含 Access Token', function () {",
+              "    pm.expect(response.accessToken).to.be.a('string').and.not.empty;",
+              "});",
+              "",
+              "pm.test('登入設定安全的 Refresh Token Cookie', function () {",
+              "    pm.expect(refreshTokenMatch).not.to.equal(null);",
+              "    pm.expect(setCookieHeader).to.include('HttpOnly');",
+              "    pm.expect(setCookieHeader).to.include('Secure');",
+              "    pm.expect(setCookieHeader).to.match(/SameSite=Strict/i);",
+              "    pm.expect(setCookieHeader).to.match(/Max-Age=\\d+/i);",
+              "});",
+              "",
+              "if (refreshTokenMatch) {",
+              "    pm.collectionVariables.set('refreshToken', refreshTokenMatch[1]);",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Login - Invalid Password",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{testEmail}}\",\n  \"password\": \"{{wrongPassword}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('錯誤密碼回傳 401', function () {",
+              "    pm.response.to.have.status(401);",
+              "});",
+              "",
+              "pm.test('錯誤密碼不洩漏帳號狀態', function () {",
+              "    const response = pm.response.json();",
+              "    pm.expect(response.message).to.eql('Invalid email or password.');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Login - Account Does Not Exist",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"missing-{{testEmail}}\",\n  \"password\": \"{{currentPassword}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('不存在帳號回傳 401', function () {",
+              "    pm.response.to.have.status(401);",
+              "});",
+              "",
+              "pm.test('不存在帳號不洩漏帳號狀態', function () {",
+              "    const response = pm.response.json();",
+              "    pm.expect(response.message).to.eql('Invalid email or password.');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Refresh - Success",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Cookie",
+            "value": "refreshToken={{refreshToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/auth/refresh",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "auth",
+            "refresh"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('有效 Refresh Token 可取得 Access Token', function () {",
+              "    pm.response.to.have.status(200);",
+              "    const response = pm.response.json();",
+              "    pm.expect(response.accessToken).to.be.a('string').and.not.empty;",
+              "});",
+              "",
+              "pm.test('V1 Refresh 不更換 Refresh Token Cookie', function () {",
+              "    pm.expect(pm.response.headers.get('Set-Cookie')).to.not.exist;",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Logout - Success",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Cookie",
+            "value": "refreshToken={{refreshToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/auth/logout",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "auth",
+            "logout"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('有效 Refresh Token 登出成功', function () {",
+              "    pm.response.to.have.status(204);",
+              "    pm.expect(pm.response.text()).to.eql('');",
+              "});",
+              "",
+              "pm.test('登出會清除 Refresh Token Cookie', function () {",
+              "    const setCookieHeader = pm.response.headers.get('Set-Cookie');",
+              "    pm.expect(setCookieHeader).to.match(/^refreshToken=;/i);",
+              "    pm.expect(setCookieHeader).to.match(/Expires=Thu, 01 Jan 1970|Max-Age=0/i);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Refresh - Revoked Session",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Cookie",
+            "value": "refreshToken={{refreshToken}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/auth/refresh",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "auth",
+            "refresh"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('已撤銷 Session 的 Refresh Token 回傳 401', function () {",
+              "    pm.response.to.have.status(401);",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

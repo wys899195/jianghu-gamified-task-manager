@@ -6,7 +6,9 @@
 
 ```text
 API-Tests/
+├── account-collection.json
 ├── auth-collection.json
+├── auth-session-collection.json
 ├── health-collection.json
 ├── local-environment.json
 └── data/
@@ -30,4 +32,4 @@ Repository 已提供 `sh/test/run_api_test.sh` 作為統一入口。先依 [`sh/
 sh/test/run_api_test.sh
 ```
 
-此 runner 依序執行 health 與 authentication collections，並為 authentication collection 載入 `data/register.json`。若日後重整為 `collections/`、`environments/` 等目錄，必須在同一變更中更新 runner 與本文件。
+此 runner 依序執行 health、註冊、Auth Session 與 account collections，並為註冊 collection 載入 `data/register.json`。Auth Session collection 會建立專用測試帳號，驗證重複 Email、登入、Refresh、登出與 Refresh Cookie 的生命週期。Account collection 會自行建立並刪除專用測試帳號，以完整流程驗證身份驗證、密碼確認、hard delete、Refresh Cookie 清除與 Session cascade。若日後重整為 `collections/`、`environments/` 等目錄，必須在同一變更中更新 runner 與本文件。

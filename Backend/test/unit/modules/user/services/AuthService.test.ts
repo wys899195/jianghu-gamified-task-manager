@@ -11,6 +11,10 @@ import {
 } from '../../../../../src/config/PasswordConfig.js';
 
 import {
+    authConfig,
+} from '../../../../../src/config/AuthConfig.js';
+
+import {
     ServiceError,
 } from '../../../../../src/shared/errors/ServiceError.js';
 
@@ -166,12 +170,14 @@ const {
     '../../../../../src/modules/user/services/AuthService.js'
 );
 
-// 目標函式：AuthService.register
-describe('AuthService.register', () => {
+describe('AuthService', () => {
 
     afterEach(() => {
+        jest.restoreAllMocks();
         jest.resetAllMocks();
     });
+
+    describe('register', () => {
 
     /*
         測試目標：確認重複 Email 會拒絕註冊並停止後續流程。
@@ -267,6 +273,10 @@ describe('AuthService.register', () => {
         );
     });
 
+    });
+
+    describe('login', () => {
+
     /*
         測試目標：確認不存在的帳號無法登入。
         預期結果：拋出 USER_INVALID_CREDENTIALS，且不比對密碼或建立 Session。
@@ -320,11 +330,18 @@ describe('AuthService.register', () => {
 
     /*
         測試目標：確認有效帳密會建立登入 Session 並回傳兩種 Token。
-        預期結果：Session 使用 Refresh Token hash，且更新最後登入時間。
+        預期結果：Session 使用 Refresh Token hash、正確有效期限，且更新最後登入時間。
     */
     test('creates a session and returns tokens for valid credentials', async () => {
 
-        // 模擬登入流程中各外部依賴的成功結果。
+        // Arrange：先把現在時間固定住，並準備登入成功時各元件會回傳的資料。
+        const fixedNow = Date.parse(
+            '2026-09-03T00:00:00.000Z',
+        );
+        const expectedExpiresAt = new Date(
+            fixedNow + authConfig.refreshTokenExpiresInMs,
+        );
+        jest.spyOn(Date, 'now').mockReturnValue(fixedNow);
         findAuthByEmailMock.mockResolvedValue(validAccountAuth);
         bcryptCompareMock.mockResolvedValue(true);
         generateRefreshTokenMock.mockReturnValue(generatedRefreshToken);
@@ -333,6 +350,7 @@ describe('AuthService.register', () => {
         createAccessTokenMock.mockReturnValue(generatedAccessToken);
         updateLastLoginMock.mockResolvedValue();
 
+        // Act：用正確帳密呼叫登入。
         await expect(
             login(validLoginRequest),
         ).resolves.toEqual({
@@ -340,10 +358,11 @@ describe('AuthService.register', () => {
             refreshToken: generatedRefreshToken,
         });
 
+        // Assert：確認 Session 的到期時間，是固定時間再加上設定的有效期限。
         expect(createSessionMock).toHaveBeenCalledWith(
             expectedAccountId,
             generatedRefreshTokenHash,
-            expect.any(Date),
+            expectedExpiresAt,
         );
         expect(createAccessTokenMock).toHaveBeenCalledWith(
             expectedAccountId,
@@ -352,6 +371,10 @@ describe('AuthService.register', () => {
             expectedAccountId,
         );
     });
+
+    });
+
+    describe('refreshAccessToken', () => {
 
     /*
         測試目標：確認無有效 Refresh Session 時不能取得新 Access Token。
@@ -401,6 +424,10 @@ describe('AuthService.register', () => {
         );
     });
 
+    });
+
+    describe('logout', () => {
+
     /*
         測試目標：確認沒有有效 Session 時登出保持冪等。
         預期結果：回傳 false，且不嘗試撤銷 Session。
@@ -438,5 +465,7 @@ describe('AuthService.register', () => {
         expect(revokeSessionMock).toHaveBeenCalledWith(
             activeAuthSession.id,
         );
+    });
+
     });
 });

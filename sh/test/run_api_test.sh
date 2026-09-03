@@ -1,5 +1,5 @@
 #!/bin/sh
-# 在 test Backend 上執行 health 與 authentication API 的 Postman CLI 測試。
+# 在 test Backend 上執行 health、與各模組 API 的 Postman CLI 測試。
 
 set -eu
 
@@ -29,7 +29,9 @@ fi
 
 for collection_path in \
   "$PROJECT_ROOT/API-Tests/health-collection.json" \
-  "$PROJECT_ROOT/API-Tests/auth-collection.json"; do
+  "$PROJECT_ROOT/API-Tests/auth-collection.json" \
+  "$PROJECT_ROOT/API-Tests/auth-session-collection.json" \
+  "$PROJECT_ROOT/API-Tests/account-collection.json"; do
   if [ ! -f "$collection_path" ]; then
     msg_error "找不到 Postman Collection：$collection_path"
     exit 1
@@ -72,5 +74,11 @@ run_collection "$PROJECT_ROOT/API-Tests/health-collection.json"
 
 echo "開始執行 Test Auth API 自動化測試……"
 run_collection "$PROJECT_ROOT/API-Tests/auth-collection.json" "$REGISTER_DATA_PATH"
+
+echo "開始執行 Test Auth Session API 自動化測試……"
+run_collection "$PROJECT_ROOT/API-Tests/auth-session-collection.json"
+
+echo "開始執行 Test Account API 自動化測試……"
+run_collection "$PROJECT_ROOT/API-Tests/account-collection.json"
 
 msg_success "Test API 自動化測試完成。"

@@ -10,6 +10,7 @@ import type { RowDataPacket } from 'mysql2';
 import { backendMysqlPool } from './infrastructure/database/MysqlConnector.js';
 
 import authRoutes from './modules/user/routes/AuthRoutes.js';
+import accountRoutes from './modules/user/routes/accountRoutes.js';
 
 import {
     userErrorResponseMap,
@@ -111,6 +112,12 @@ app.get('/api/health/database', async (_req, res) => {
 app.use(
     '/auth',
     authRoutes,
+);
+
+// Account APIs
+app.use(
+    '/account',
+    accountRoutes,
 );
 
 

@@ -8,6 +8,7 @@ export const UserErrorCode = {
     USER_INVALID_CREDENTIALS: 'USER_INVALID_CREDENTIALS',
     USER_INVALID_ACCESS_TOKEN: 'USER_INVALID_ACCESS_TOKEN',
     USER_INVALID_REFRESH_TOKEN: 'USER_INVALID_REFRESH_TOKEN',
+    USER_INVALID_PASSWORD: 'USER_INVALID_PASSWORD',
     USER_ACCOUNT_NOT_FOUND: 'USER_ACCOUNT_NOT_FOUND',
 } as const;
 
@@ -39,6 +40,10 @@ export const userErrorResponseMap:
     [UserErrorCode.USER_INVALID_REFRESH_TOKEN]: {
         statusCode: 401,
         message: 'Authentication required.',
+    },
+    [UserErrorCode.USER_INVALID_PASSWORD]: {
+        statusCode: 401,
+        message: 'Invalid password.',
     },
     [UserErrorCode.USER_ACCOUNT_NOT_FOUND]: {
         statusCode: 404,

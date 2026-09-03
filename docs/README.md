@@ -47,6 +47,7 @@
 對外 HTTP API 契約。目前包含：
 
 - [`authentication.md`](api/authentication.md)：Auth routes、Request／Response、Cookie 與公開錯誤行為。
+- [`account.md`](api/account.md)：Account lifecycle routes、身份驗證、Request／Response 與公開錯誤行為。
 
 ### [`testing/`](testing/README.md)
 
