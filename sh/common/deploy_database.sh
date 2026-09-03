@@ -1,6 +1,5 @@
 #!/bin/sh
 # 部署 development 或 test 資料庫，並執行對應 migration。
-# Internal helper：由 development 與 test 的資料庫部署入口呼叫，不作為日常入口直接執行。
 
 set -eu
 

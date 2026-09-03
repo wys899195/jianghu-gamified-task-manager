@@ -1,6 +1,5 @@
 #!/bin/sh
 # 啟動指定環境的 Backend 與 Frontend，不執行資料庫部署或 migration。
-# Internal helper：由 development 與 test 的 deploy 或 restart 入口呼叫，不作為日常入口直接執行。
 
 set -eu
 

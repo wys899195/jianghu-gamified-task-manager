@@ -1,6 +1,5 @@
 #!/bin/sh
 # 啟動 MySQL 容器並等待其 healthcheck 通過。
-# Internal helper：由環境資料庫部署流程呼叫，不作為日常入口直接執行。
 
 set -eu
 

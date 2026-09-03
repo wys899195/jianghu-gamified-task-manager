@@ -1,7 +1,6 @@
 #!/bin/sh
 # 依指定環境啟動 Frontend development server，或建立並預覽 production build。
 # host 與 port 由 Frontend/.env 載入後傳給 Vite CLI。
-# Internal helper：由各環境的 Frontend 啟動入口呼叫，不作為日常入口直接執行。
 
 set -eu
 

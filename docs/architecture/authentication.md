@@ -118,15 +118,15 @@ AND expires_at > NOW()
 
 精確 table、column、index 與 foreign key 由 `Database/migrations/` 表達，不在本文件維護第二份 Schema。
 
-## 6. Frontend Concurrent Refresh
+## 6. Frontend Concurrent Refresh（提案／待實作）
 
-多個 API 同時因 Access Token 過期收到 401 時，Frontend 使用 `refreshPromise`、mutex 或其他 single-flight 機制：
+Frontend 目前尚未實作 Auth API client 與 concurrent refresh。提案是在多個 API 同時因 Access Token 過期收到 401 時，使用 `refreshPromise`、mutex 或其他 single-flight 機制：
 
 - 第一個 Request 發起 refresh。
 - 其他 Request 等待同一 Promise。
 - Refresh 成功後共同使用新 Access Token retry。
 
-V1 即可採此模式；V2 加入 Rotation 後更是必要的 concurrency boundary。
+此模式尚未取得實作完成狀態；V2 若加入 Rotation，會成為更重要的 concurrency boundary。
 
 ## 7. Design Rationale
 

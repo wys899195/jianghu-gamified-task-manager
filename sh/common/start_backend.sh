@@ -1,6 +1,5 @@
 #!/bin/sh
 # 依根目錄 APP_ENV 注入 NODE_ENV，並啟動對應的 Backend server script。
-# Internal helper：由各環境的 Backend 啟動入口呼叫，不作為日常入口直接執行。
 
 set -eu
 

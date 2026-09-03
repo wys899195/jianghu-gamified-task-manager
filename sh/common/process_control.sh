@@ -1,6 +1,5 @@
 #!/bin/sh
 # 提供環境服務共用的 PID file 建立、清理與停止功能。
-# Internal library：必須由其他 shell script 以 . 載入，不可直接執行。
 
 prepare_pid_file() {
   pid_file="$1"

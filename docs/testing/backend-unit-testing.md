@@ -2,7 +2,7 @@
 
 本文件只規範 Backend Unit Test 的 Jest ESM、Mock、hook、fixture、命名與目錄。測試分層、案例風險選擇與 Coverage 由 [`testing-strategy.md`](testing-strategy.md) 負責。
 
-目前可執行實作使用 `Backend/test/unit/`、`@jest/globals`、`jest.unstable_mockModule`、dynamic import 與相鄰的 `*MockData.ts` fixture。不得在單一測試工作中自行更換框架、mock 寫法、命名或目錄結構。
+目前可執行實作使用 `Backend/test/unit/`、`@jest/globals`、`jest.unstable_mockModule`、dynamic import 與相鄰的 Mock Data fixture。不得在單一測試工作中自行更換框架、mock 寫法或目錄結構；TypeScript 識別字與檔名 casing 由 [`coding-style.md`](../conventions/coding-style.md) 統一管理。
 
 ## 執行與驗證
 
@@ -106,7 +106,7 @@ const {
 
 ## 名稱、註解、fixture 與目錄
 
-- 測試檔命名為 `<目標模組>.test.ts`；可重用 fixture 命名為 `<目標模組>MockData.ts`，放在對應測試檔旁。
+- 測試檔保留 `.test.ts` 後綴，主檔名沿用被測試檔案，例如 `authService.ts` 對應 `authService.test.ts`；可重用 fixture 使用 camelCase，例如 `authServiceMockData.ts`，並放在對應測試檔旁。
 - `describe` 使用目標模組或函式名稱；`test` 使用英文且描述可觀察行為，例如 `rejects when the email already exists`。
 - 每個 `test(...)` 上方必須使用以下 block comment，測試目標與預期結果不寫在函式內：
 
@@ -121,9 +121,11 @@ test('describes observable behavior', async () => {
 - 對測試中的 `const`、`jest.unstable_mockModule` 與不直觀 mock 設定，使用簡短單行註解說明用途。
 - 上述測試專屬註解格式、必要性與使用時機由本文件定義；TypeScript 原始碼的通用註解規則見 [TypeScript 註解規範](../conventions/comments/typescript.md)。
 - 遵循 strict 型別且不使用 `any`。fixture 的 optional 欄位若會在 Assert 視為必填，使用 `satisfies` 保留精確型別。
-- 只在同一測試檔重複使用的 request、預期值或假資料才抽到 `*MockData.ts`；fixture 放資料、不放測試流程。
+- 只在同一測試檔重複使用的 request、預期值或假資料才抽到 camelCase 的 Mock Data 檔案，例如 `authServiceMockData.ts`；fixture 放資料、不放測試流程。
 - 保持案例獨立，不依賴執行順序；每個案例自行設定所需 mock。
-- `Backend/test/unit/` 依 `Backend/src/` 的責任區域安排目錄，例如 `src/modules/user/services/AuthService.ts` 對應 `test/unit/modules/user/services/AuthService.test.ts`。
+- `Backend/test/unit/` 依 `Backend/src/` 的責任區域安排目錄，例如 `src/modules/user/services/authService.ts` 對應 `test/unit/modules/user/services/authService.test.ts`。
+
+目前 repository 仍有 PascalCase 的既有 TypeScript 與測試檔名；本次不批次重新命名。新增檔案遵循 TypeScript 命名規範，既有檔名另由獨立工作同步處理 import、Mock path 與設定。
 
 ## Express 與 API 測試分工
 

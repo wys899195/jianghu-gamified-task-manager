@@ -1,6 +1,5 @@
 #!/bin/sh
 # 停止指定環境的 Backend 或 Frontend，不影響其他環境服務。
-# Internal helper：由各環境的 service 停止入口呼叫，不作為日常入口直接執行。
 
 set -eu
 
