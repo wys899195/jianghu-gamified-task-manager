@@ -38,7 +38,7 @@ services:
       - mysql_data:/var/lib/mysql
 
       # 保留初始化 SQL 掛載點；正式與測試 schema 由 Backend migration runner 管理。
-      - ./database/init:/docker-entrypoint-initdb.d:ro
+      - ./Database/init:/docker-entrypoint-initdb.d:ro
 
     # 額外設定 MySQL 字元集，utf8mb4 可完整保存繁體中文及 Emoji。
     # 額外設定資料庫預設時區。

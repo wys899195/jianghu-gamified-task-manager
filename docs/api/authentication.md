@@ -21,7 +21,7 @@ Request body：
 |---|---|
 | `email` | required string、trim、符合 Email 格式 |
 | `password` | required string、至少 8 字元、至少一個英文字母與一個數字；不 trim |
-| `nickname` | optional string、trim、非空；最大長度仍有實作差異待確認 |
+| `nickname` | optional string、trim、非空、最多 30 字元 |
 
 成功回傳：
 
@@ -40,7 +40,7 @@ Request body：
 | 欄位 | 已確認契約 |
 |---|---|
 | `email` | required string、trim、符合 Email 格式 |
-| `password` | required string、不可為空；建立／修改密碼的強度政策不應阻止既有合法帳號登入 |
+| `password` | required string、至少 8 字元、至少一個英文字母與一個數字；不 trim，與 Register 使用相同定義 |
 
 成功回傳：
 
@@ -86,10 +86,3 @@ maxAge: 與 Refresh Session 有效期限一致
 - Schema／欄位缺失／型別／格式錯誤：400 Request Validation Error。
 - 帳號或密碼不正確、Access Token 無效、Refresh Token 無效：Authentication Error。
 - 公開 status 與 message 由 Backend module response map 統一維護，流程見 [`../architecture/api-error-handling.md`](../architecture/api-error-handling.md)。
-
-## 已知實作差異
-
-下列差異不得自行選擇一方覆蓋；需在相關需求工作中確認後同步 Schema、測試與本契約：
-
-- 本次整理前的設計文件指定 nickname 最大 50 字元；目前 `AuthRequestSchema.ts` 實作為 20。
-- 本次整理前的設計文件指定 Login password 只需非空；目前 Login 與 Register 共用至少 8 字元且需英數混合的 password Schema。

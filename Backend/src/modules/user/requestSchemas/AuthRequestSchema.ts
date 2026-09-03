@@ -23,7 +23,7 @@ const nicknameSchema = z
     .string()
     .trim()
     .min(1, 'Nickname is required')
-    .max(20, 'Nickname must be at most 20 characters');
+    .max(30, 'Nickname must be at most 30 characters');
 
 export const loginRequestSchema = z.object({
     email: emailSchema,
